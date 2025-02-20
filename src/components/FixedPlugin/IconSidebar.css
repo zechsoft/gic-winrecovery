@@ -1,0 +1,156 @@
+/* Sidebar Toggle Button (Initially `>` with White Circle) */
+.sidebar-toggle-btn {
+    position: fixed;
+    left: 20px; /* Initially outside the sidebar */
+    top:160px; /* Positioned at the bottom */
+    background: white;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    transition: left 0.3s ease-in-out, background 0.3s ease-in-out;
+}
+
+/* When Sidebar Opens (`|` moves 3px right, no circle) */
+.icon-sidebar.open + .sidebar-toggle-btn {
+    left: 63px; /* Sidebar width (60px) + 3px */
+    background: none; /* Removes the circle */
+    font-size: 24px;
+    width: auto;
+    height: auto;
+    box-shadow: none;
+}
+
+/* Sidebar Container */
+.icon-sidebar {
+    position: fixed;
+    left: -60px; /* Initially hidden */
+    top: 0;
+    height: 50vh;
+    width: 60px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    justify-content: center;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid #ddd;
+    border-top-right-radius: 20px;  /* Rounded top-right */
+    border-bottom-right-radius: 20px; /* Rounded bottom-right */
+    transition: left 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+}
+
+/* When Sidebar Opens */
+.icon-sidebar.open {
+    left: 0;
+}
+
+/* Sidebar Icons */
+.icon-sidebar-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Sidebar Buttons */
+.icon-sidebar-btn {
+    background: none;
+    border: none;
+    color: gray;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.icon-sidebar-btn:hover {
+    transform: scale(1.1);
+    color: #34495e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .icon-sidebar {
+        height: 70vh;
+    }
+}
+/* Sidebar Dropdown */
+.icon-sidebar-dropdown {
+    position: relative;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    position: absolute;
+    left: 50px; /* Open to the right */
+    top: 0;
+    background: white;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 120px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dropdown Items */
+.dropdown-item {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    text-align: left;
+    width: 100%;
+    color: gray;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.dropdown-item:hover {
+    background: #f1f1f1;
+    color: #34495e;
+}
+
+/* Dropdown Divider */
+.dropdown-divider {
+    border-top: 1px solid #ddd;
+    margin: 8px 0;
+}
+/* Tooltip (Icon Name on Hover) */
+.tooltip {
+    position: absolute;
+    left: 65px; /* Position tooltip to the right */
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+
+/* Show Tooltip when Hovered */
+.icon-container:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Positioning for Sidebar Icons */
+.icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
