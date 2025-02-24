@@ -1,8 +1,8 @@
 /* Sidebar Toggle Button (Initially `>` with White Circle) */
 .sidebar-toggle-btn {
     position: fixed;
-    left: 20px; /* Initially outside the sidebar */
-    top:160px; /* Positioned at the bottom */
+    right: 20px; /* Initially outside the sidebar on the right */
+    top: 160px; /* Positioned at the bottom */
     background: white;
     border: none;
     cursor: pointer;
@@ -15,12 +15,12 @@
     align-items: center;
     justify-content: center;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    transition: left 0.3s ease-in-out, background 0.3s ease-in-out;
+    transition: right 0.3s ease-in-out, background 0.3s ease-in-out;
 }
 
-/* When Sidebar Opens (`|` moves 3px right, no circle) */
+/* When Sidebar Opens (`|` moves 3px left, no circle) */
 .icon-sidebar.open + .sidebar-toggle-btn {
-    left: 63px; /* Sidebar width (60px) + 3px */
+    right: 63px; /* Sidebar width (60px) + 3px */
     background: none; /* Removes the circle */
     font-size: 24px;
     width: auto;
@@ -31,7 +31,7 @@
 /* Sidebar Container */
 .icon-sidebar {
     position: fixed;
-    left: -60px; /* Initially hidden */
+    right: -60px; /* Initially hidden on the right */
     top: 0;
     height: 50vh;
     width: 60px;
@@ -42,15 +42,15 @@
     padding-top: 20px;
     justify-content: center;
     box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
-    border-right: 1px solid #ddd;
-    border-top-right-radius: 20px;  /* Rounded top-right */
-    border-bottom-right-radius: 20px; /* Rounded bottom-right */
-    transition: left 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+    border-left: 1px solid #ddd; /* Change border to the left */
+    border-top-left-radius: 20px;  /* Rounded top-left */
+    border-bottom-left-radius: 20px; /* Rounded bottom-left */
+    transition: right 0.3s ease-in-out, border-radius 0.3s ease-in-out;
 }
 
 /* When Sidebar Opens */
 .icon-sidebar.open {
-    left: 0;
+    right: 0;
 }
 
 /* Sidebar Icons */
@@ -82,6 +82,7 @@
         height: 70vh;
     }
 }
+
 /* Sidebar Dropdown */
 .icon-sidebar-dropdown {
     position: relative;
@@ -90,7 +91,7 @@
 /* Dropdown Menu */
 .dropdown-menu {
     position: absolute;
-    left: 50px; /* Open to the right */
+    right: 50px; /* Open to the left */
     top: 0;
     background: white;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
@@ -125,10 +126,11 @@
     border-top: 1px solid #ddd;
     margin: 8px 0;
 }
+
 /* Tooltip (Icon Name on Hover) */
 .tooltip {
     position: absolute;
-    left: 65px; /* Position tooltip to the right */
+    right: 65px; /* Position tooltip to the left */
     top: 50%;
     transform: translateY(-50%);
     background: rgba(0, 0, 0, 0.8);

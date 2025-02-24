@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { 
+import {
   Flex, Text, Button, Input, Table, Thead, Tbody, Tr, Th, Td, Avatar, IconButton, Tooltip, Box, 
   InputGroup, InputLeftElement, Icon, Tabs, TabList, TabPanels, TabPanel, Tab, Modal, ModalOverlay, 
   ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Select 
-} from "@chakra-ui/react";
+} from "@chakra-ui/react";  // Ensure Tab is imported here
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
@@ -16,44 +16,36 @@ const TABS = [
 ];
 
 const TABLE_HEAD = [
-  "Customer Number",
-  "customer",
-  "buyer ",
-  "Second-order Classification",
+  "#",
+  "Supplier Material",
+  "Supplement Order Number",
   "Status",
-  "Document Status",
-  "Abnormal Info",
-  "Invitee",
-  "Re-auth Person",
-  "Contact Info",
-  "Invitation Date",
-  "",
+  "Explanation",
+  "Create Time",
+  "Update Time",
 ];
 
-export function SupplierInfo() {
+let TABLE_ROWS = [
+  { id: "1", supplierMaterial: "Material A", supplementOrderNumber: "SO12345", status: "Pending", explanation: "Waiting for approval", createTime: "23/04/18", updateTime: "23/04/18" },
+  { id: "2", supplierMaterial: "Material B", supplementOrderNumber: "SO67890", status: "Approved", explanation: "Ready for shipment", createTime: "23/04/19", updateTime: "23/04/19" },
+];
+
+export function MaterialInquiry() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState(""); 
   const [secondOrderSearch, setSecondOrderSearch] = useState(""); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRowData, setNewRowData] = useState({
-    customerNumber: "",
-    customer: "",
-    buyer: "",
-    secondOrderClassification: "",
+    id: "",
+    supplierMaterial: "",
+    supplementOrderNumber: "",
     status: "",
-    documentStatus: "",
-    abnormalInfo: "",
-    invitee: "",
-    reAuthPerson: "",
-    contactInfo: "",
-    date: "",
+    explanation: "",
+    createTime: "",
+    updateTime: "",
   });
-  const [editRowIndex, setEditRowIndex] = useState(null); // Track the index of the row being edited
-  const [country, setCountry] = useState("USA"); // State for the selected country
-  const [tableRows, setTableRows] = useState([
-    { customerNumber: "C12345", customer: "John Michael", email: "john@creative-tim.com", buyer: "Manager", secondOrderClassification: "A", status: "Active", documentStatus: "Verified", abnormalInfo: "None", invitee: "Yes", reAuthPerson: "Jane Doe", contactInfo: "+1234567890", date: "23/04/18" },
-    { customerNumber: "C67890", customer: "Alexa Liras", email: "alexa@creative-tim.com", buyer: "Programmer", secondOrderClassification: "B", status: "Inactive", documentStatus: "Pending", abnormalInfo: "Pending", invitee: "No", reAuthPerson: "John Smith", contactInfo: "+0987654321", date: "23/04/18" },
-  ]); // Convert TABLE_ROWS to state
+  const [editRowIndex, setEditRowIndex] = useState(null); 
+  const [country, setCountry] = useState("USA");
 
   const rowsPerPage = 5;
   const borderColor = "gray.300"; 
@@ -61,9 +53,9 @@ export function SupplierInfo() {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
 
-  const filteredRows = tableRows.filter(row =>
-    row.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.secondOrderClassification.toLowerCase().includes(secondOrderSearch.toLowerCase())
+  const filteredRows = TABLE_ROWS.filter(row =>
+    row.supplierMaterial.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    row.supplementOrderNumber.toLowerCase().includes(secondOrderSearch.toLowerCase())
   );
 
   const currentRows = filteredRows.slice(indexOfFirstRow, indexOfLastRow);
@@ -83,23 +75,9 @@ export function SupplierInfo() {
   };
 
   const openModal = (rowIndex = null) => {
-    setEditRowIndex(rowIndex); // Pass the row index if editing an existing row
+    setEditRowIndex(rowIndex);
     if (rowIndex !== null) {
-      setNewRowData(tableRows[rowIndex]); // Populate modal fields with the current row's data
-    } else {
-      setNewRowData({
-        customerNumber: "",
-        customer: "",
-        buyer: "",
-        secondOrderClassification: "",
-        status: "",
-        documentStatus: "",
-        abnormalInfo: "",
-        invitee: "",
-        reAuthPerson: "",
-        contactInfo: "",
-        date: "",
-      });
+      setNewRowData(TABLE_ROWS[rowIndex]); 
     }
     setIsModalOpen(true);
   };
@@ -107,19 +85,15 @@ export function SupplierInfo() {
   const closeModal = () => {
     setIsModalOpen(false);
     setNewRowData({
-      customerNumber: "",
-      customer: "",
-      buyer: "",
-      secondOrderClassification: "",
+      id: "",
+      supplierMaterial: "",
+      supplementOrderNumber: "",
       status: "",
-      documentStatus: "",
-      abnormalInfo: "",
-      invitee: "",
-      reAuthPerson: "",
-      contactInfo: "",
-      date: "",
+      explanation: "",
+      createTime: "",
+      updateTime: "",
     });
-    setEditRowIndex(null); // Reset edit mode
+    setEditRowIndex(null);
   };
 
   const handleInputChange = (e) => {
@@ -132,31 +106,26 @@ export function SupplierInfo() {
 
   const handleSaveRow = () => {
     if (editRowIndex !== null) {
-      // Update the row in the table
-      const updatedRows = [...tableRows];
-      updatedRows[editRowIndex] = newRowData;
-      setTableRows(updatedRows);
+      TABLE_ROWS[editRowIndex] = newRowData;
     } else {
-      // Add new row to the top of the table
-      setTableRows([newRowData, ...tableRows]); // This ensures the new row appears at the top
+      TABLE_ROWS.unshift(newRowData); 
     }
     closeModal();
   };
 
-  const navigate = useHistory(); // Initialize useNavigate
+  const navigate = useHistory();
 
   const handleViewAllClick = () => {
-    navigate.push('/admin/tables');  // Redirect to the desired page when View All is clicked
+    navigate.push('/admin/tables'); 
   };
 
   return (
     <Box mt={16}>
       <Flex direction="column" bg="white" p={6} boxShadow="md" borderRadius="15px" maxWidth="1200px" mx="auto">
-        {/* Card Header */}
         <Flex justify="space-between" mb={8}>
           <Flex direction="column">
-            <Text fontSize="xl" fontWeight="bold">Supplier List</Text>
-            <Text fontSize="md" color="gray.500">See information about all suppliers</Text>
+            <Text fontSize="xl" fontWeight="bold">Material Inquiry</Text>
+            <Text fontSize="md" color="gray.500">See information about all material inquiries</Text>
           </Flex>
           <Flex direction="row" gap={2}>
             <Button size="sm" variant="outline" onClick={handleViewAllClick}>
@@ -168,10 +137,8 @@ export function SupplierInfo() {
           </Flex>
         </Flex>
 
-        {/* Wrap Tabs inside the Tabs component */}
         <Tabs defaultIndex={0} className="w-full md:w-max" isLazy>
           <Flex justify="space-between" align="center" mb={4}>
-            {/* Tabs */}
             <TabList>
               {TABS.map(({ label, value }) => (
                 <Tab key={value} value={value} _selected={{ color: 'blue.500', borderColor: 'blue.500' }} _focus={{ outline: 'none' }}>
@@ -180,42 +147,19 @@ export function SupplierInfo() {
               ))}
             </TabList>
 
-            {/* Search Bars and Clear Button */}
             <Flex direction="row" gap={4} align="center">
-              <Select
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                placeholder="Select"
-                width={40}
-              >
+              <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="Select" width={40}>
                 <option value="USA">All</option>
                 <option value="Germany">Germany</option>
                 <option value="Italy">Italy</option>
                 <option value="China">China</option>
               </Select>
-              <motion.div
-                whileFocus={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-              >
+              <motion.div whileFocus={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
                 <InputGroup>
                   <InputLeftElement pointerEvents="none">
                     <MagnifyingGlassIcon style={{ height: "30px", width: "20px", padding: "2.5px", marginTop: "px" }} />
                   </InputLeftElement>
-                  <Input
-                    variant="filled"
-                    placeholder="Search here"
-                    size="md"
-                    borderRadius="lg"
-                    width={{ base: "full", lg: "220px" }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    bg="white"
-                    borderColor="gray.300"
-                    _focus={{
-                      borderColor: "blue.500",
-                      boxShadow: "0 0 0 1px rgba(66,153,225,0.6)",
-                    }}
-                  />
+                  <Input variant="filled" placeholder="Search here" size="md" borderRadius="lg" width={{ base: "full", lg: "220px" }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} bg="white" borderColor="gray.300" _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px rgba(66,153,225,0.6)" }} />
                 </InputGroup>
               </motion.div>
               <Button size="sm" colorScheme="blue" onClick={() => { setSearchTerm(""); setSecondOrderSearch(""); }} marginLeft={4}>
@@ -242,34 +186,17 @@ export function SupplierInfo() {
                   </Thead>
                   <Tbody>
                     {currentRows.map((row, index) => (
-                      <Tr key={row.customer}>
-                        <Td py={3}>{row.customerNumber}</Td>
-                        <Td py={3}>
-                          <Flex align="center" gap={3}>
-                            <Avatar size="sm" />
-                            <Flex direction="column">
-                              <Text fontWeight="normal">{row.customer}</Text>
-                            </Flex>
-                          </Flex>
-                        </Td>
-                        <Td py={3}>{row.buyer}</Td>
-                        <Td py={3}>{row.secondOrderClassification}</Td>
+                      <Tr key={row.id}>
+                        <Td py={3}>{row.id}</Td>
+                        <Td py={3}>{row.supplierMaterial}</Td>
+                        <Td py={3}>{row.supplementOrderNumber}</Td>
                         <Td py={3}>{row.status}</Td>
-                        <Td py={3}>{row.documentStatus}</Td>
-                        <Td py={3}>{row.abnormalInfo}</Td>
-                        <Td py={3}>{row.invitee}</Td>
-                        <Td py={3}>{row.reAuthPerson}</Td>
-                        <Td py={3}>{row.contactInfo}</Td>
-                        <Td py={3}>{row.date}</Td>
+                        <Td py={3}>{row.explanation}</Td>
+                        <Td py={3}>{row.createTime}</Td>
+                        <Td py={3}>{row.updateTime}</Td>
                         <Td py={3}>
                           <Tooltip label="Edit User">
-                            <IconButton 
-                              variant="outline" 
-                              aria-label="Edit" 
-                              icon={<Icon as={PencilIcon} boxSize={5} />} 
-                              size="sm" 
-                              onClick={() => openModal(index)} 
-                            />
+                            <IconButton variant="outline" aria-label="Edit" icon={<Icon as={PencilIcon} boxSize={5} />} size="sm" onClick={() => openModal(index)} />
                           </Tooltip>
                         </Td>
                       </Tr>
@@ -278,7 +205,6 @@ export function SupplierInfo() {
                 </Table>
               </Box>
 
-              {/* Footer */}
               <Flex justify="space-between" align="center" mt={4}>
                 <Text fontSize="sm" color="gray.500">Page {currentPage} of {totalPages}</Text>
                 <Flex gap={2}>
@@ -290,11 +216,10 @@ export function SupplierInfo() {
           </TabPanels>
         </Tabs>
 
-        {/* Modal */}
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>{editRowIndex !== null ? "Edit Supplier" : "Add New Supplier"}</ModalHeader>
+            <ModalHeader>{editRowIndex !== null ? "Edit Material Inquiry" : "Add New Material Inquiry"}</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               {TABLE_HEAD.slice(0, -1).map((head, index) => (
@@ -310,7 +235,7 @@ export function SupplierInfo() {
             </ModalBody>
             <ModalFooter>
               <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-              <Button colorScheme="blue" onClick={handleSaveRow}>Save Supplier</Button>
+              <Button colorScheme="blue" onClick={handleSaveRow}>Save Material Inquiry</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
@@ -319,4 +244,4 @@ export function SupplierInfo() {
   );
 }
 
-export default SupplierInfo;
+export default MaterialInquiry;

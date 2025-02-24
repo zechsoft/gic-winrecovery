@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { 
+import {
   Flex, Text, Button, Input, Table, Thead, Tbody, Tr, Th, Td, Avatar, IconButton, Tooltip, Box, 
   InputGroup, InputLeftElement, Icon, Tabs, TabList, TabPanels, TabPanel, Tab, Modal, ModalOverlay, 
   ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Select 
-} from "@chakra-ui/react";
+} from "@chakra-ui/react";  // Ensure Tab is imported here
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
@@ -17,20 +17,29 @@ const TABS = [
 
 const TABLE_HEAD = [
   "Customer Number",
-  "customer",
-  "buyer ",
-  "Second-order Classification",
-  "Status",
-  "Document Status",
-  "Abnormal Info",
-  "Invitee",
-  "Re-auth Person",
-  "Contact Info",
-  "Invitation Date",
-  "",
+  "Customer",
+  "Buyer",
+  "Platform No",
+  "PO No",
+  "Purchase Date",
+  "Order Amount",
+  "Currency",
+  "Purchasing Department",
+  "Purchaser",
+  "Requisition Business Group",
+  "Delivery Status",
+  "Order Status",
+  "Acceptance Status",
+  "Statement Status",
+  "Operation",
 ];
 
-export function SupplierInfo() {
+let TABLE_ROWS = [
+  { customerNumber: "C12345", customer: "John Michael", buyer: "Manager", platformNo: "P123", poNo: "PO12345", purchaseDate: "23/04/18", orderAmount: "$2000", currency: "USD", purchasingDept: "Sales", purchaser: "Jane Doe", requisitionGroup: "Group A", deliveryStatus: "Delivered", orderStatus: "Completed", acceptanceStatus: "Accepted", statementStatus: "Settled", operation: "View" },
+  { customerNumber: "C67890", customer: "Alexa Liras", buyer: "Programmer", platformNo: "P124", poNo: "PO67890", purchaseDate: "23/04/19", orderAmount: "$5000", currency: "USD", purchasingDept: "Marketing", purchaser: "John Smith", requisitionGroup: "Group B", deliveryStatus: "Pending", orderStatus: "In Progress", acceptanceStatus: "Pending", statementStatus: "Open", operation: "Edit" },
+];
+
+export function CustomerOrder() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState(""); 
   const [secondOrderSearch, setSecondOrderSearch] = useState(""); 
@@ -39,21 +48,22 @@ export function SupplierInfo() {
     customerNumber: "",
     customer: "",
     buyer: "",
-    secondOrderClassification: "",
-    status: "",
-    documentStatus: "",
-    abnormalInfo: "",
-    invitee: "",
-    reAuthPerson: "",
-    contactInfo: "",
-    date: "",
+    platformNo: "",
+    poNo: "",
+    purchaseDate: "",
+    orderAmount: "",
+    currency: "",
+    purchasingDept: "",
+    purchaser: "",
+    requisitionGroup: "",
+    deliveryStatus: "",
+    orderStatus: "",
+    acceptanceStatus: "",
+    statementStatus: "",
+    operation: "",
   });
-  const [editRowIndex, setEditRowIndex] = useState(null); // Track the index of the row being edited
-  const [country, setCountry] = useState("USA"); // State for the selected country
-  const [tableRows, setTableRows] = useState([
-    { customerNumber: "C12345", customer: "John Michael", email: "john@creative-tim.com", buyer: "Manager", secondOrderClassification: "A", status: "Active", documentStatus: "Verified", abnormalInfo: "None", invitee: "Yes", reAuthPerson: "Jane Doe", contactInfo: "+1234567890", date: "23/04/18" },
-    { customerNumber: "C67890", customer: "Alexa Liras", email: "alexa@creative-tim.com", buyer: "Programmer", secondOrderClassification: "B", status: "Inactive", documentStatus: "Pending", abnormalInfo: "Pending", invitee: "No", reAuthPerson: "John Smith", contactInfo: "+0987654321", date: "23/04/18" },
-  ]); // Convert TABLE_ROWS to state
+  const [editRowIndex, setEditRowIndex] = useState(null); 
+  const [country, setCountry] = useState("USA");
 
   const rowsPerPage = 5;
   const borderColor = "gray.300"; 
@@ -61,9 +71,9 @@ export function SupplierInfo() {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
 
-  const filteredRows = tableRows.filter(row =>
+  const filteredRows = TABLE_ROWS.filter(row =>
     row.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.secondOrderClassification.toLowerCase().includes(secondOrderSearch.toLowerCase())
+    row.platformNo.toLowerCase().includes(secondOrderSearch.toLowerCase())
   );
 
   const currentRows = filteredRows.slice(indexOfFirstRow, indexOfLastRow);
@@ -83,23 +93,9 @@ export function SupplierInfo() {
   };
 
   const openModal = (rowIndex = null) => {
-    setEditRowIndex(rowIndex); // Pass the row index if editing an existing row
+    setEditRowIndex(rowIndex);
     if (rowIndex !== null) {
-      setNewRowData(tableRows[rowIndex]); // Populate modal fields with the current row's data
-    } else {
-      setNewRowData({
-        customerNumber: "",
-        customer: "",
-        buyer: "",
-        secondOrderClassification: "",
-        status: "",
-        documentStatus: "",
-        abnormalInfo: "",
-        invitee: "",
-        reAuthPerson: "",
-        contactInfo: "",
-        date: "",
-      });
+      setNewRowData(TABLE_ROWS[rowIndex]); 
     }
     setIsModalOpen(true);
   };
@@ -110,16 +106,21 @@ export function SupplierInfo() {
       customerNumber: "",
       customer: "",
       buyer: "",
-      secondOrderClassification: "",
-      status: "",
-      documentStatus: "",
-      abnormalInfo: "",
-      invitee: "",
-      reAuthPerson: "",
-      contactInfo: "",
-      date: "",
+      platformNo: "",
+      poNo: "",
+      purchaseDate: "",
+      orderAmount: "",
+      currency: "",
+      purchasingDept: "",
+      purchaser: "",
+      requisitionGroup: "",
+      deliveryStatus: "",
+      orderStatus: "",
+      acceptanceStatus: "",
+      statementStatus: "",
+      operation: "",
     });
-    setEditRowIndex(null); // Reset edit mode
+    setEditRowIndex(null);
   };
 
   const handleInputChange = (e) => {
@@ -132,31 +133,26 @@ export function SupplierInfo() {
 
   const handleSaveRow = () => {
     if (editRowIndex !== null) {
-      // Update the row in the table
-      const updatedRows = [...tableRows];
-      updatedRows[editRowIndex] = newRowData;
-      setTableRows(updatedRows);
+      TABLE_ROWS[editRowIndex] = newRowData;
     } else {
-      // Add new row to the top of the table
-      setTableRows([newRowData, ...tableRows]); // This ensures the new row appears at the top
+      TABLE_ROWS.unshift(newRowData); 
     }
     closeModal();
   };
 
-  const navigate = useHistory(); // Initialize useNavigate
+  const navigate = useHistory();
 
   const handleViewAllClick = () => {
-    navigate.push('/admin/tables');  // Redirect to the desired page when View All is clicked
+    navigate.push('/admin/tables'); 
   };
 
   return (
     <Box mt={16}>
       <Flex direction="column" bg="white" p={6} boxShadow="md" borderRadius="15px" maxWidth="1200px" mx="auto">
-        {/* Card Header */}
         <Flex justify="space-between" mb={8}>
           <Flex direction="column">
-            <Text fontSize="xl" fontWeight="bold">Supplier List</Text>
-            <Text fontSize="md" color="gray.500">See information about all suppliers</Text>
+            <Text fontSize="xl" fontWeight="bold">Customer Order List</Text>
+            <Text fontSize="md" color="gray.500">See information about all customer orders</Text>
           </Flex>
           <Flex direction="row" gap={2}>
             <Button size="sm" variant="outline" onClick={handleViewAllClick}>
@@ -168,10 +164,8 @@ export function SupplierInfo() {
           </Flex>
         </Flex>
 
-        {/* Wrap Tabs inside the Tabs component */}
         <Tabs defaultIndex={0} className="w-full md:w-max" isLazy>
           <Flex justify="space-between" align="center" mb={4}>
-            {/* Tabs */}
             <TabList>
               {TABS.map(({ label, value }) => (
                 <Tab key={value} value={value} _selected={{ color: 'blue.500', borderColor: 'blue.500' }} _focus={{ outline: 'none' }}>
@@ -180,42 +174,19 @@ export function SupplierInfo() {
               ))}
             </TabList>
 
-            {/* Search Bars and Clear Button */}
             <Flex direction="row" gap={4} align="center">
-              <Select
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                placeholder="Select"
-                width={40}
-              >
+              <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="Select" width={40}>
                 <option value="USA">All</option>
                 <option value="Germany">Germany</option>
                 <option value="Italy">Italy</option>
                 <option value="China">China</option>
               </Select>
-              <motion.div
-                whileFocus={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-              >
+              <motion.div whileFocus={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
                 <InputGroup>
                   <InputLeftElement pointerEvents="none">
                     <MagnifyingGlassIcon style={{ height: "30px", width: "20px", padding: "2.5px", marginTop: "px" }} />
                   </InputLeftElement>
-                  <Input
-                    variant="filled"
-                    placeholder="Search here"
-                    size="md"
-                    borderRadius="lg"
-                    width={{ base: "full", lg: "220px" }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    bg="white"
-                    borderColor="gray.300"
-                    _focus={{
-                      borderColor: "blue.500",
-                      boxShadow: "0 0 0 1px rgba(66,153,225,0.6)",
-                    }}
-                  />
+                  <Input variant="filled" placeholder="Search here" size="md" borderRadius="lg" width={{ base: "full", lg: "220px" }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} bg="white" borderColor="gray.300" _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px rgba(66,153,225,0.6)" }} />
                 </InputGroup>
               </motion.div>
               <Button size="sm" colorScheme="blue" onClick={() => { setSearchTerm(""); setSecondOrderSearch(""); }} marginLeft={4}>
@@ -253,23 +224,22 @@ export function SupplierInfo() {
                           </Flex>
                         </Td>
                         <Td py={3}>{row.buyer}</Td>
-                        <Td py={3}>{row.secondOrderClassification}</Td>
-                        <Td py={3}>{row.status}</Td>
-                        <Td py={3}>{row.documentStatus}</Td>
-                        <Td py={3}>{row.abnormalInfo}</Td>
-                        <Td py={3}>{row.invitee}</Td>
-                        <Td py={3}>{row.reAuthPerson}</Td>
-                        <Td py={3}>{row.contactInfo}</Td>
-                        <Td py={3}>{row.date}</Td>
+                        <Td py={3}>{row.platformNo}</Td>
+                        <Td py={3}>{row.poNo}</Td>
+                        <Td py={3}>{row.purchaseDate}</Td>
+                        <Td py={3}>{row.orderAmount}</Td>
+                        <Td py={3}>{row.currency}</Td>
+                        <Td py={3}>{row.purchasingDept}</Td>
+                        <Td py={3}>{row.purchaser}</Td>
+                        <Td py={3}>{row.requisitionGroup}</Td>
+                        <Td py={3}>{row.deliveryStatus}</Td>
+                        <Td py={3}>{row.orderStatus}</Td>
+                        <Td py={3}>{row.acceptanceStatus}</Td>
+                        <Td py={3}>{row.statementStatus}</Td>
+                        <Td py={3}>{row.operation}</Td>
                         <Td py={3}>
                           <Tooltip label="Edit User">
-                            <IconButton 
-                              variant="outline" 
-                              aria-label="Edit" 
-                              icon={<Icon as={PencilIcon} boxSize={5} />} 
-                              size="sm" 
-                              onClick={() => openModal(index)} 
-                            />
+                            <IconButton variant="outline" aria-label="Edit" icon={<Icon as={PencilIcon} boxSize={5} />} size="sm" onClick={() => openModal(index)} />
                           </Tooltip>
                         </Td>
                       </Tr>
@@ -278,7 +248,6 @@ export function SupplierInfo() {
                 </Table>
               </Box>
 
-              {/* Footer */}
               <Flex justify="space-between" align="center" mt={4}>
                 <Text fontSize="sm" color="gray.500">Page {currentPage} of {totalPages}</Text>
                 <Flex gap={2}>
@@ -290,7 +259,6 @@ export function SupplierInfo() {
           </TabPanels>
         </Tabs>
 
-        {/* Modal */}
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <ModalOverlay />
           <ModalContent>
@@ -319,4 +287,4 @@ export function SupplierInfo() {
   );
 }
 
-export default SupplierInfo;
+export default CustomerOrder;

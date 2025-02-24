@@ -1,12 +1,6 @@
 import {
   Flex,
-  Table,
-  Tbody,
   Text,
-  Th,
-  Td,
-  Thead,
-  Tr,
   useColorModeValue,
   Button,
   Menu,
@@ -19,14 +13,18 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from '@chakra-ui/icons'; // For the dropdown icon
 import React, { useState } from "react";
-import { tablesProjectData, tablesTableData } from "variables/general";
+import { tablesTableData } from "variables/general"; // Removed tablesProjectData since Projects Table is removed
 
 // Custom components
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
-import TablesProjectRow from "components/Tables/TablesProjectRow";
-import TablesTableRow from "components/Tables/TablesTableRow";
+import SupplierInformationTable from "./SupplierInformationTable"; // Import the Supplier Information Table
+import CustomerOrderTable from "./CustomerOrderTable"; // Import the Customer Order Table
+import MaterialInquiryTable from "./MaterialInquiryTable"; // Import the Material Inquiry Table
+import MaterialReplenishTable from "./MaterialReplenishTable"; // Import the Material Replenish Table
+import CustomerDeliveryTable from "./CustomerDeliveryTable"; // Import the Customer Delivery Table
+import DailyWorkerReportTable from "./DailyWorkerReportTable"; // Import the Daily Worker Report Table
 
 function Tables() {
   const [currentTable, setCurrentTable] = useState('Supplier Information'); // State to control the visible table
@@ -41,10 +39,6 @@ function Tables() {
   const filteredTableData = tablesTableData.filter(row =>
     row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     row.customerNumber.toString().includes(searchQuery)
-  );
-
-  const filteredProjectData = tablesProjectData.filter(row =>
-    row.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Calculate the indices for the current page
@@ -82,7 +76,11 @@ function Tables() {
               <MenuButton as={IconButton} icon={<ChevronDownIcon />} variant="outline" />
               <MenuList>
                 <MenuItem onClick={() => setCurrentTable('Supplier Information')}>Supplier Information</MenuItem>
-                <MenuItem onClick={() => setCurrentTable('Projects Table')}>Projects Table</MenuItem>
+                <MenuItem onClick={() => setCurrentTable('Customer Order')}>Customer Order</MenuItem>
+                <MenuItem onClick={() => setCurrentTable('Material Inquiry')}>Material Inquiry</MenuItem>
+                <MenuItem onClick={() => setCurrentTable('Material Replenish')}>Material Replenish</MenuItem>
+                <MenuItem onClick={() => setCurrentTable('Customer Delivery')}>Customer Delivery</MenuItem>
+                <MenuItem onClick={() => setCurrentTable('Daily Worker Report')}>Daily Worker Report</MenuItem>
               </MenuList>
             </Menu>
             {/* Table Name placed 2px to the right of the dropdown */}
@@ -110,46 +108,42 @@ function Tables() {
         <CardBody>
           <div style={{ overflowX: 'auto', position: 'relative' }}>
             {currentTable === 'Supplier Information' ? (
-              <Table variant="simple" color={textColor}>
-                <Thead>
-                  <Tr my=".8rem" pl="0px" color="gray.400">
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Customer Number</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Customer</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Buyer</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Second-order Classification</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Status</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Document Status</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Abnormal Info</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Invitee</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Re-auth Person</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Contact Info</Th>
-                    <Th pl="35px" pr="35px" borderColor={borderColor} color="gray.400">Invitation Date</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {currentRows.map((row, index) => (
-                    <TablesTableRow key={row.customerNumber} {...row} isLast={index === currentRows.length - 1} />
-                  ))}
-                </Tbody>
-              </Table>
-            ) : (
-              <Table variant="simple" color={textColor}>
-                <Thead>
-                  <Tr my=".8rem" pl="0px">
-                    <Th pl="0px" color="gray.400" borderColor={borderColor}>Companies</Th>
-                    <Th color="gray.400" borderColor={borderColor}>Budget</Th>
-                    <Th color="gray.400" borderColor={borderColor}>Status</Th>
-                    <Th color="gray.400" borderColor={borderColor}>Completion</Th>
-                    <Th></Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {filteredProjectData.slice(indexOfFirstRow, indexOfLastRow).map((row, index) => (
-                    <TablesProjectRow key={index} {...row} isLast={index === filteredProjectData.length - 1} />
-                  ))}
-                </Tbody>
-              </Table>
-            )}
+              <SupplierInformationTable
+                currentRows={currentRows}
+                textColor={textColor}
+                borderColor={borderColor}
+              />
+            ) : currentTable === 'Customer Order' ? (
+              <CustomerOrderTable
+                currentRows={currentRows}
+                textColor={textColor}
+                borderColor={borderColor}
+              />
+            ) : currentTable === 'Material Inquiry' ? (
+              <MaterialInquiryTable
+                currentRows={currentRows}
+                textColor={textColor}
+                borderColor={borderColor}
+              />
+            ) : currentTable === 'Material Replenish' ? (
+              <MaterialReplenishTable
+                currentRows={currentRows}
+                textColor={textColor}
+                borderColor={borderColor}
+              />
+            ) : currentTable === 'Customer Delivery' ? (
+              <CustomerDeliveryTable
+                currentRows={currentRows}
+                textColor={textColor}
+                borderColor={borderColor}
+              />
+            ) : currentTable === 'Daily Worker Report' ? (
+              <DailyWorkerReportTable
+                currentRows={currentRows}
+                textColor={textColor}
+                borderColor={borderColor}
+              />
+            ) : null}
           </div>
         </CardBody>
 

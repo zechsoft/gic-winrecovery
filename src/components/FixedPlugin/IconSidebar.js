@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaHome, FaUser, FaTable, FaEnvelope, FaSignOutAlt, FaChevronRight } from "react-icons/fa";
+import { FaHome, FaUser, FaTable, FaEnvelope, FaSignOutAlt, FaChevronLeft } from "react-icons/fa";
 import "./IconSidebar.css";
 
 const IconSidebar = () => {
@@ -72,7 +72,7 @@ const IconSidebar = () => {
 
       {/* Sidebar Toggle Button */}
       <button ref={toggleBtnRef} className="sidebar-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? "|" : <FaChevronRight />}
+        {isOpen ? "|" : <FaChevronLeft />}
       </button>
     </>
   );

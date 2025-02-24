@@ -192,7 +192,7 @@ export default function Dashboard(props) {
         />
         
   {/* Position Side in the middle-bottom */}
-  <Box position="fixed" top="25%" left="0px" transform="translateY(-20%)" zIndex="9999">
+  <Box position="fixed" top="25%" right="0px" transform="translateY(-20%)" zIndex="9999">
   <Side />
 </Box>
 

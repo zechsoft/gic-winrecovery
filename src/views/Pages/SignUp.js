@@ -13,6 +13,7 @@ import {
   Text,
   useColorModeValue,
   LightMode,
+  Select,
 } from "@chakra-ui/react";
 // Assets
 import BgSignUp from "assets/img/BgSignUp.png";
@@ -26,6 +27,10 @@ function SignUp() {
   const colorIcons = useColorModeValue("gray.700", "white");
   const bgIcons = useColorModeValue("trasnparent", "navy.700");
   const bgIconsHover = useColorModeValue("gray.50", "whiteAlpha.100");
+
+  // State to manage the selected role
+  const [role, setRole] = React.useState("");
+
   return (
     <Flex
       direction='column'
@@ -200,6 +205,33 @@ function SignUp() {
               mb='24px'
               size='lg'
             />
+            {/* Dropdown for Role Selection */}
+            <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
+              Role
+            </FormLabel>
+            <Select
+              placeholder='Select role'
+              mb='24px'
+              size='lg'
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              sx={{
+                fontSize: "sm", // Reduce font size
+                _hover: {
+                  borderColor: "blue.500", // Change hover border color to blue
+                },
+                _focus: {
+                  borderColor: "blue.500", // Change focus border color to blue
+                  boxShadow: "none", // Remove shadow
+                },
+                "& option": {
+                  fontSize: "sm", // Reduce font size of dropdown options
+                },
+              }}>
+              <option value='admin'>Admin</option>
+              <option value='client'>Client</option>
+              <option value='worker'>Worker</option>
+            </Select>
             <FormControl display='flex' alignItems='center' mb='24px'>
               <Switch id='remember-login' colorScheme='blue' me='10px' />
               <FormLabel htmlFor='remember-login' mb='0' fontWeight='normal'>

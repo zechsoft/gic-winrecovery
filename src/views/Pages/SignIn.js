@@ -11,6 +11,7 @@ import {
   Link,
   Checkbox,
   useColorModeValue,
+  Select,
 } from "@chakra-ui/react";
 // Assets
 import signInImage from "assets/img/signInImage.png";
@@ -23,6 +24,9 @@ export default function SignIn() {
   const titleColor = useColorModeValue("gray.700", "blue.500");
   const blueShade = useColorModeValue("#0072ff", "#0072ff"); // Blue color for buttons/links
 
+  // State to manage the selected role
+  const [role, setRole] = React.useState("");
+
   return (
     <Flex position="relative" mb="40px">
       <Flex
@@ -33,23 +37,23 @@ export default function SignIn() {
         mx="auto"
         justifyContent="space-between"
         mb="30px"
-        pt={{ md: "100px" }} // Added padding to push the content down
+        alignItems="flex-start" // Align containers to the top
       >
         {/* Left Column (Login Content) */}
         <Flex
           w={{ base: "100%", md: "50%" }}
           h="100%"
-          alignItems="left"
-          justifyContent="left"
+          alignItems="flex-start" // Align content to the top
+          justifyContent="flex-start" // Align content to the top
           mb="60px"
-          mt="-90px" // Adjusted to move the container further down
+          mt="0" // Ensure no margin at the top
         >
           <Flex
             zIndex="2"
             direction="column"
             w="700px"
-            h={718}
-            justifyContent="center"
+            h="auto" // Adjust height to fit content
+            justifyContent="flex-start" // Align content to the top
             padding={"40px"}
             background="transparent"
             borderBottomLeftRadius="20px"
@@ -135,6 +139,41 @@ export default function SignIn() {
               />
             </FormControl>
 
+            {/* Role Dropdown */}
+            <FormControl mb="3">
+              <FormLabel fontSize="sm" fontWeight="normal">
+                Role*
+              </FormLabel>
+              <Select
+                placeholder="Select role"
+                mb="3"
+                border="1px solid #e0e0e0"
+                borderRadius={7}
+                h="50px" // Increased height
+                p="12px" // Increased padding
+                fontSize="16px"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                sx={{
+                  fontSize: "sm", // Reduced font size
+                  _hover: {
+                    borderColor: "blue.500", // Change hover border color to blue
+                  },
+                  _focus: {
+                    borderColor: "blue.500", // Change focus border color to blue
+                    boxShadow: "none", // Remove shadow
+                  },
+                  "& option": {
+                    fontSize: "sm", // Reduced font size of dropdown options
+                  },
+                }}
+              >
+                <option value="admin">Admin</option>
+                <option value="client">Client</option>
+                <option value="worker">Worker</option>
+              </Select>
+            </FormControl>
+
             {/* Remember Me Checkbox */}
             <Flex mb="5" justify="space-between" align="center">
               <Flex align="center">
@@ -195,6 +234,7 @@ export default function SignIn() {
             "0px 5px 14px rgba(67, 55, 226, 0.05)", // Same shadow as left column
             "unset"
           )}
+          alignItems="flex-start" // Align content to the top
         >
           {/* Image with bottom-left curve */}
           <Box
