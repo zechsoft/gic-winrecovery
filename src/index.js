@@ -9,7 +9,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import theme from "theme/theme.js";
 
 // Simulate user role (e.g., this could come from context or API)
-const userRole = "admin"; // Change this to "client" to test for client role
+const userRole = "client"; // Change this to "client" to test for client role
 
 ReactDOM.render(
   <ChakraProvider theme={theme} resetCss={false} position="relative">
