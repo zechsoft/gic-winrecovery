@@ -2,7 +2,7 @@
 .sidebar-toggle-btn {
     position: fixed;
     right: 20px; /* Initially outside the sidebar on the right */
-    top: 160px; /* Positioned at the bottom */
+    top: 180px; /* Positioned at the bottom */
     background: white;
     border: none;
     cursor: pointer;
@@ -10,7 +10,7 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    color: gray;
+    color: #3182ce; /* Changed to #3182ce */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -26,6 +26,7 @@
     width: auto;
     height: auto;
     box-shadow: none;
+    color: #3182ce; /* Ensure icon color remains #3182ce when sidebar is open */
 }
 
 /* Sidebar Container */
@@ -64,7 +65,7 @@
 .icon-sidebar-btn {
     background: none;
     border: none;
-    color: gray;
+    color: #3182ce; /* Changed to #3182ce */
     font-size: 24px;
     cursor: pointer;
     padding: 10px;
@@ -73,7 +74,7 @@
 
 .icon-sidebar-btn:hover {
     transform: scale(1.1);
-    color: #34495e;
+    color: #3182ce; /* Keep the color consistent even when hovered */
 }
 
 /* Responsive */
@@ -97,7 +98,7 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     padding: 8px 0;
-    min-width: 120px;
+    width:500%;
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -117,8 +118,9 @@
 }
 
 .dropdown-item:hover {
-    background: #f1f1f1;
-    color: #34495e;
+    color: #f1f1f1;
+     background-color: #3182ce;
+    
 }
 
 /* Dropdown Divider */

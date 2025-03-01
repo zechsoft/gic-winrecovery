@@ -8,19 +8,22 @@ import {
   ChakraLogoLight,
 } from "components/Icons/Icons";
 // Layout components
-import ClientNavbar from "components/Navbars/ClientNavbar.js";  // Changed to ClientNavbar
+import ClientNavbar from "components/Navbars/ClientNavbar.js"; // Import ClientNavbar instead of AdminNavbar
 import Sidebar from "components/Sidebar/Sidebar.js";
 import { Redirect, Route, Switch } from "react-router-dom";
-import routes from "clientroutes.js";
+import routes from "clientroutes.js"; // Use client-specific routes
 // Custom Chakra theme
 import FixedPlugin from "../components/FixedPlugin/FixedPlugin";
 import ShiprocketChatbot from "../components/FixedPlugin/ShiprocketChatbot";
+import IconSidebar from "components/FixedPlugin/IconSidebar";
 import "../components/FixedPlugin/Chatbot.css";
 // Custom components
 import MainPanel from "../components/Layout/MainPanel";
 import PanelContainer from "../components/Layout/PanelContainer";
 import PanelContent from "../components/Layout/PanelContent";
-import bgClient from "assets/img/client-background.png"; // Assuming a different background for client layout
+import bgAdmin from "assets/img/admin-background.png";
+// Import SidebarProvider
+import { SidebarProvider } from "contexts/SidebarContext";
 
 export default function Client(props) {
   const { ...rest } = props;
@@ -29,11 +32,11 @@ export default function Client(props) {
 
   // Functions for getting active route and navbar
   const getRoute = () => {
-    return window.location.pathname !== "/client/full-screen-maps";
+    return window.location.pathname !== "/client/full-screen-maps"; // Update path for client
   };
 
   const getActiveRoute = (routes) => {
-    let activeRoute = "Client Dashboard";
+    let activeRoute = "Client Dashboard"; // Update title for client
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].collapse) {
         let collapseActiveRoute = getActiveRoute(routes[i].views);
@@ -81,7 +84,7 @@ export default function Client(props) {
       if (prop.category === "account") {
         return getRoutes(prop.views);
       }
-      if (prop.layout === "/client") {  // Changed layout to "/client"
+      if (prop.layout === "/client") { // Update layout path for client
         return (
           <Route
             path={prop.layout + prop.path}
@@ -99,83 +102,83 @@ export default function Client(props) {
   document.documentElement.dir = "ltr";
 
   return (
-    <Box>
-      <Box
-        minH="40vh"
-        w="100%"
-        position="absolute"
-        bgImage={colorMode === "light" ? bgClient : "none"} // Changed to client background
-        bg={colorMode === "light" ? bgClient : "navy.900"}
-        bgSize="cover"
-        top="0"
-      />
-      <Sidebar
-        routes={routes}
-        logo={
-          <Stack direction="row" spacing="12px" align="center" justify="center">
-            {colorMode === "dark" ? (
-              <ArgonLogoLight w="74px" h="27px" />
-            ) : (
-              <ArgonLogoDark w="74px" h="27px" />
-            )}
-            <Box w="1px" h="20px" bg={colorMode === "dark" ? "white" : "gray.700"} />
-            {colorMode === "dark" ? (
-              <ChakraLogoLight w="82px" h="21px" />
-            ) : (
-              <ChakraLogoDark w="82px" h="21px" />
-            )}
-          </Stack>
-        }
-        display="none"
-        {...rest}
-      />
-      <MainPanel
-        w={{
-          base: "100%",
-          xl: "calc(100% - 275px)",
-        }}
-      >
-        <Portal>
-          <ClientNavbar
-            onOpen={onOpen}
-            brandText={getActiveRoute(routes)}
-            secondary={getActiveNavbar(routes)}
-            fixed={fixed}
-            {...rest}
-          />
-        </Portal>
-        {getRoute() ? (
-          <PanelContent>
-            <PanelContainer>
-              <Switch>
-                {getRoutes(routes)}
-                {/* Redirect to default dashboard */}
-                <Redirect from="/client" to="/client/dashboard" />
-              </Switch>
-            </PanelContainer>
-          </PanelContent>
-        ) : null}
-        <Portal>
-          <FixedPlugin
-            secondary={getActiveNavbar(routes)}
-            fixed={fixed}
-            onOpen={onOpen}
-          />
-        </Portal>
-
-        <Configurator
-          secondary={getActiveNavbar(routes)}
-          isOpen={isOpen}
-          onClose={onClose}
-          isChecked={fixed}
-          onSwitch={(value) => setFixed(value)}
+    // Wrap the entire component with SidebarProvider
+    <SidebarProvider>
+      <Box>
+        <Box
+          minH="40vh"
+          w="100%"
+          position="absolute"
+          bgImage={colorMode === "light" ? bgAdmin : "none"}
+          bg={colorMode === "light" ? bgAdmin : "navy.900"}
+          bgSize="cover"
+          top="0"
         />
-        
-        {/* Popup Chatbot Component */}
-        <Box position="fixed" bottom="20px" left="20px" zIndex="9999">
-          <ShiprocketChatbot />
-        </Box>
-      </MainPanel>
-    </Box>
+        {/* Sidebar component now uses context */}
+        <Sidebar
+          routes={routes}
+          logo={
+            <Stack direction="row" spacing="12px" align="center" justify="center">
+              {colorMode === "dark" ? (
+                <ArgonLogoLight w="74px" h="27px" />
+              ) : (
+                <ArgonLogoDark w="74px" h="27px" />
+              )}
+              <Box w="1px" h="20px" bg={colorMode === "dark" ? "white" : "gray.700"} />
+              {colorMode === "dark" ? (
+                <ChakraLogoLight w="82px" h="21px" />
+              ) : (
+                <ChakraLogoDark w="82px" h="21px" />
+              )}
+            </Stack>
+          }
+          display="block"
+          {...rest}
+        />
+        <MainPanel w="100%">
+          <Portal>
+            <ClientNavbar // Use ClientNavbar instead of AdminNavbar
+              onOpen={onOpen}
+              brandText={getActiveRoute(routes)}
+              secondary={getActiveNavbar(routes)}
+              fixed={fixed}
+              {...rest}
+            />
+          </Portal>
+          {getRoute() ? (
+            <PanelContent>
+              <PanelContainer>
+                <Switch>
+                  {getRoutes(routes)}
+                  <Redirect from="/client" to="/client/dashboard" /> {/* Update redirect path for client */}
+                </Switch>
+              </PanelContainer>
+            </PanelContent>
+          ) : null}
+          <Portal>
+            <FixedPlugin
+              secondary={getActiveNavbar(routes)}
+              fixed={fixed}
+              onOpen={onOpen}
+            />
+          </Portal>
+
+          <Configurator
+            secondary={getActiveNavbar(routes)}
+            isOpen={isOpen}
+            onClose={onClose}
+            isChecked={fixed}
+            onSwitch={(value) => setFixed(value)}
+          />
+          <Box position="fixed" bottom="78%" right="0px" transform="translateY(50%)" zIndex="9999">
+          <IconSidebar basePath="/client" />
+          </Box>
+
+          <Box position="fixed" bottom="20px" left="20px" zIndex="9999">
+            <ShiprocketChatbot />
+          </Box>
+        </MainPanel>
+      </Box>
+    </SidebarProvider>
   );
 }

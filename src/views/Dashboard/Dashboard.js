@@ -21,7 +21,7 @@ import {
 // Custom components
 import Card from "components/Card/Card.js";
 import IconBox from "components/Icons/IconBox";
-import React, { useState } from 'react';
+import { React, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { motion } from "framer-motion"; // Importing motion for animations
 
@@ -114,241 +114,344 @@ const handleNextTable = () => {
   return (
     <Flex flexDirection="column" pt={{ base: "120px", md: "75px" }}>
       <SimpleGrid columns={{ sm: 1, md: 3, xl: 4 }} spacing="24px" mb="20px">
-        <Card minH="125px">
-          <Flex direction="column">
-            <Flex
-              flexDirection="row"
-              align="center"
-              justify="center"
-              w="100%"
-              mb="25px"
-              onClick={handleNavigateToSupplierInfo}
-            >
-              <Stat me="auto">
-                <StatLabel fontSize="xs" color="gray.400" fontWeight="bold" textTransform="uppercase">
-                  new entry
-                </StatLabel>
-                <Flex>
-                  <StatNumber fontSize={18} color={textColor} fontWeight="bold">
-                    Supplier Information
-                  </StatNumber>
-                </Flex>
-              </Stat>
-              <IconBox
-                borderRadius="50%"
-                as="box"
-                h={"45px"}
-                w={"45px"}
-                bg={iconBlue}
-              >
-                <WalletIcon h={"24px"} w={"24px"} color={iconBoxInside} />
-              </IconBox>
-            </Flex>
-            <Text color="gray.400" fontSize="sm">
-              <Text as="span" color="green.400" fontWeight="bold">
-                {" "}
-              </Text>
-              <Box onClick={handleNavigateToSupplierInfo1}>Tap here to view</Box>
-            </Text>
-          </Flex>
-        </Card>
+      <Card
+  minH="125px"
+  transition="transform 0.3s ease-in-out"
+  _hover={{ transform: "scale(1.05)", cursor: "pointer" }}
+>
+  <Flex direction="column">
+    <Flex
+      flexDirection="row"
+      align="center"
+      justify="center"
+      w="100%"
+      mb="25px"
+      onClick={handleNavigateToSupplierInfo}
+    >
+      <Stat me="auto">
+        <StatLabel fontSize="xs" color="gray.400" fontWeight="bold" textTransform="uppercase">
+          new entry
+        </StatLabel>
+        <Flex>
+          <StatNumber
+            fontSize={18}
+            color={textColor}
+            fontWeight="bold"
+            position="relative"
+            _hover={{
+              _after: {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                bottom: "-2px",
+                width: "100%",
+                height: "2px",
+                bg: "blue.500", // Blue underline on hover
+                transition: "width 0.3s ease-in-out",
+              },
+            }}
+            _after={{
+              content: '""',
+              position: "absolute",
+              left: 0,
+              bottom: "-2px",
+              width: "0%",
+              height: "2px",
+              bg: "blue.500", // Blue underline color
+              transition: "width 0.3s ease-in-out",
+            }}
+          >
+            Supplier Information
+          </StatNumber>
+        </Flex>
+      </Stat>
+      <IconBox borderRadius="50%" as="box" h={"45px"} w={"45px"} bg={iconBlue}>
+        <WalletIcon h={"24px"} w={"24px"} color={iconBoxInside} />
+      </IconBox>
+    </Flex>
+    <Text color="gray.400" fontSize="sm">
+      <Text as="span" color="green.400" fontWeight="bold"></Text>
+      <Box onClick={handleNavigateToSupplierInfo1} _hover={{ cursor: "pointer" }}>
+        Tap here to view
+      </Box>
+    </Text>
+  </Flex>
+</Card>
+
         {/* Other cards... */}
-        <Card minH='125px'>
-          <Flex direction='column'>
-            <Flex
-              flexDirection='row'
-              align='center'
-              justify='center'
-              w='100%'
-              mb='25px'>
-              <Stat me='auto'>
-                <StatLabel
-                  fontSize='xs'
-                  color='gray.400'
-                  fontWeight='bold'
-                  textTransform='uppercase'>
-                  new entry
-                </StatLabel>
-                <Flex>
-                  <StatNumber fontSize='lg' color={textColor} fontWeight='bold'>
-                    Material Inquiry
-                  </StatNumber>
-                </Flex>
-              </Stat>
-              <IconBox
-                borderRadius='50%'
-                as='box'
-                h={"45px"}
-                w={"45px"}
-                bg={iconBlue}>
-                <GlobeIcon h={"24px"} w={"24px"} color={iconBoxInside} />
-              </IconBox>
-            </Flex>
-            <Text color='gray.400' fontSize='sm'>
-              <Text as='span' color='green.400' fontWeight='bold'>
-                {" "}
-              </Text>
-              Tap here to view
-            </Text>
-          </Flex>
-        </Card>
-        <Card minH='125px'>
-          <Flex direction='column'>
-            <Flex
-              flexDirection='row'
-              align='center'
-              justify='center'
-              w='100%'
-              mb='25px'>
-              <Stat me='auto'>
-                <StatLabel
-                  fontSize='xs'
-                  color='gray.400'
-                  fontWeight='bold'
-                  textTransform='uppercase'>
-                  new entry
-                </StatLabel>
-                <Flex>
-                  <StatNumber fontSize='lg' color={textColor} fontWeight='bold'>
-                    Customer Delivery
-                  </StatNumber>
-                </Flex>
-              </Stat>
-              <IconBox
-                borderRadius='50%'
-                as='box'
-                h={"45px"}
-                w={"45px"}
-                bg={iconBlue}>
-                <DocumentIcon h={"24px"} w={"24px"} color={iconBoxInside} />
-              </IconBox>
-            </Flex>
-            <Text color='gray.400' fontSize='sm'>
-              <Text as='span' color='red.500' fontWeight='bold'>
-                {" "}
-              </Text>
-              Tap here to view
-            </Text>
-          </Flex>
-        </Card>
-        <Card minH='125px'>
-          <Flex direction='column'>
-            <Flex
-              flexDirection='row'
-              align='center'
-              justify='center'
-              w='100%'
-              mb='25px'>
-              <Stat me='auto'>
-                <StatLabel
-                  fontSize='xs'
-                  color='gray.400'
-                  fontWeight='bold'
-                  textTransform='uppercase'>
-                  new entry
-                </StatLabel>
-                <Flex>
-                  <StatNumber fontSize='lg' color={textColor} fontWeight='bold'>
-                    Customer Order
-                  </StatNumber>
-                </Flex>
-              </Stat>
-              <IconBox
-                borderRadius='50%'
-                as='box'
-                h={"45px"}
-                w={"45px"}
-                bg={iconBlue}>
-                <CartIcon h={"24px"} w={"24px"} color={iconBoxInside} />
-              </IconBox>
-            </Flex>
-            <Text color='gray.400' fontSize='sm'>
-              <Text as='span' color='green.400' fontWeight='bold'>
-                {" "}
-              </Text>
-              Tap here to view
-            </Text>
-          </Flex>
-        </Card>
-        <Card minH='125px'>
-          <Flex direction='column'>
-            <Flex
-              flexDirection='row'
-              align='center'
-              justify='center'
-              w='100%'
-              mb='25px'>
-              <Stat me='auto'>
-                <StatLabel
-                  fontSize='xs'
-                  color='gray.400'
-                  fontWeight='bold'
-                  textTransform='uppercase'>
-                  new entry
-                </StatLabel>
-                <Flex>
-                  <StatNumber fontSize={18.5} color={textColor} fontWeight='bold'>
-                    Material Replenishment
-                  </StatNumber>
-                </Flex>
-              </Stat>
-              <IconBox
-                borderRadius='50%'
-                as='box'
-                h={"45px"}
-                w={"45px"}
-                bg={iconBlue}>
-                <GlobeIcon h={"24px"} w={"24px"} color={iconBoxInside} />
-              </IconBox>
-            </Flex>
-            <Text color='gray.400' fontSize='sm'>
-              <Text as='span' color='green.400' fontWeight='bold'>
-                {" "}
-              </Text>
-              Tap here to view
-            </Text>
-          </Flex>
-        </Card>
-        <Card minH='125px'>
-          <Flex direction='column'>
-            <Flex
-              flexDirection='row'
-              align='center'
-              justify='center'
-              w='100%'
-              mb='25px'>
-              <Stat me='auto'>
-                <StatLabel
-                  fontSize='xs'
-                  color='gray.400'
-                  fontWeight='bold'
-                  textTransform='uppercase'>
-                  new entry
-                </StatLabel>
-                <Flex>
-                  <StatNumber fontSize='18' color={textColor} fontWeight='bold'>
-                    Daily Work Report
-                  </StatNumber>
-                </Flex>
-              </Stat>
-              <IconBox
-                borderRadius='50%'
-                as='box'
-                h={"45px"}
-                w={"45px"}
-                bg={iconBlue}>
-                <GlobeIcon h={"24px"} w={"24px"} color={iconBoxInside} />
-              </IconBox>
-            </Flex>
-            <Text color='gray.400' fontSize='sm'>
-              <Text as='span' color='green.400' fontWeight='bold'>
-               {" "}
-              </Text>
-              Tap here to view
-            </Text>
-          </Flex>
-        </Card>
-      
+        <Card
+  minH="125px"
+  transition="transform 0.3s ease-in-out"
+  _hover={{ transform: "scale(1.05)", cursor: "pointer" }}
+>
+  <Flex direction="column">
+    <Flex flexDirection="row" align="center" justify="center" w="100%" mb="25px">
+      <Stat me="auto">
+        <StatLabel fontSize="xs" color="gray.400" fontWeight="bold" textTransform="uppercase">
+          new entry
+        </StatLabel>
+        <Flex>
+          <StatNumber
+            fontSize="lg"
+            color={textColor}
+            fontWeight="bold"
+            position="relative"
+            _hover={{
+              _after: {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                bottom: "-2px",
+                width: "100%",
+                height: "2px",
+                bg: "blue.500", // Blue underline on hover
+                transition: "width 0.3s ease-in-out",
+              },
+            }}
+            _after={{
+              content: '""',
+              position: "absolute",
+              left: 0,
+              bottom: "-2px",
+              width: "0%",
+              height: "2px",
+              bg: "blue.500", // Blue underline color
+              transition: "width 0.3s ease-in-out",
+            }}
+          >
+            Material Inquiry
+          </StatNumber>
+        </Flex>
+      </Stat>
+      <IconBox borderRadius="50%" as="box" h={"45px"} w={"45px"} bg={iconBlue}>
+        <GlobeIcon h={"24px"} w={"24px"} color={iconBoxInside} />
+      </IconBox>
+    </Flex>
+    <Text color="gray.400" fontSize="sm">
+      <Text as="span" color="green.400" fontWeight="bold"></Text>
+      <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+    </Text>
+  </Flex>
+</Card>
+
+<Card
+  minH="125px"
+  transition="transform 0.3s ease-in-out"
+  _hover={{ transform: "scale(1.05)", cursor: "pointer" }}
+>
+  <Flex direction="column">
+    <Flex flexDirection="row" align="center" justify="center" w="100%" mb="25px">
+      <Stat me="auto">
+        <StatLabel fontSize="xs" color="gray.400" fontWeight="bold" textTransform="uppercase">
+          new entry
+        </StatLabel>
+        <Flex>
+          <StatNumber
+            fontSize="lg"
+            color={textColor}
+            fontWeight="bold"
+            position="relative"
+            _hover={{
+              _after: {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                bottom: "-2px",
+                width: "100%",
+                height: "2px",
+                bg: "blue.500", // Blue underline on hover
+                transition: "width 0.3s ease-in-out",
+              },
+            }}
+            _after={{
+              content: '""',
+              position: "absolute",
+              left: 0,
+              bottom: "-2px",
+              width: "0%",
+              height: "2px",
+              bg: "blue.500", // Blue underline color
+              transition: "width 0.3s ease-in-out",
+            }}
+          >
+            Customer Delivery
+          </StatNumber>
+        </Flex>
+      </Stat>
+      <IconBox borderRadius="50%" as="box" h={"45px"} w={"45px"} bg={iconBlue}>
+        <DocumentIcon h={"24px"} w={"24px"} color={iconBoxInside} />
+      </IconBox>
+    </Flex>
+    <Text color="gray.400" fontSize="sm">
+      <Text as="span" color="red.500" fontWeight="bold"></Text>
+      <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+    </Text>
+  </Flex>
+</Card>
+
+<Card
+  minH="125px"
+  transition="transform 0.3s ease-in-out"
+  _hover={{ transform: "scale(1.05)", cursor: "pointer" }}
+>
+  <Flex direction="column">
+    <Flex flexDirection="row" align="center" justify="center" w="100%" mb="25px">
+      <Stat me="auto">
+        <StatLabel fontSize="xs" color="gray.400" fontWeight="bold" textTransform="uppercase">
+          new entry
+        </StatLabel>
+        <Flex>
+          <StatNumber
+            fontSize="lg"
+            color={textColor}
+            fontWeight="bold"
+            position="relative"
+            _hover={{
+              _after: {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                bottom: "-2px",
+                width: "100%",
+                height: "2px",
+                bg: "blue.500", // Blue underline on hover
+                transition: "width 0.3s ease-in-out",
+              },
+            }}
+            _after={{
+              content: '""',
+              position: "absolute",
+              left: 0,
+              bottom: "-2px",
+              width: "0%",
+              height: "2px",
+              bg: "blue.500", // Blue underline color
+              transition: "width 0.3s ease-in-out",
+            }}
+          >
+            Customer Order
+          </StatNumber>
+        </Flex>
+      </Stat>
+      <IconBox borderRadius="50%" as="box" h={"45px"} w={"45px"} bg={iconBlue}>
+        <CartIcon h={"24px"} w={"24px"} color={iconBoxInside} />
+      </IconBox>
+    </Flex>
+    <Text color="gray.400" fontSize="sm">
+      <Text as="span" color="green.400" fontWeight="bold"></Text>
+      <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+    </Text>
+  </Flex>
+</Card>
+
+<Card
+  minH="125px"
+  transition="transform 0.3s ease-in-out"
+  _hover={{ transform: "scale(1.05)", cursor: "pointer" }}
+>
+  <Flex direction="column">
+    <Flex flexDirection="row" align="center" justify="center" w="100%" mb="25px">
+      <Stat me="auto">
+        <StatLabel fontSize="xs" color="gray.400" fontWeight="bold" textTransform="uppercase">
+          new entry
+        </StatLabel>
+        <Flex>
+          <StatNumber
+            fontSize={18.5}
+            color={textColor}
+            fontWeight="bold"
+            position="relative"
+            _hover={{
+              _after: {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                bottom: "-2px",
+                width: "100%",
+                height: "2px",
+                bg: "blue.500", // Blue underline on hover
+                transition: "width 0.3s ease-in-out",
+              },
+            }}
+            _after={{
+              content: '""',
+              position: "absolute",
+              left: 0,
+              bottom: "-2px",
+              width: "0%",
+              height: "2px",
+              bg: "blue.500", // Blue underline color
+              transition: "width 0.3s ease-in-out",
+            }}
+          >
+            Material Replenishment
+          </StatNumber>
+        </Flex>
+      </Stat>
+      <IconBox borderRadius="50%" as="box" h={"45px"} w={"45px"} bg={iconBlue}>
+        <GlobeIcon h={"24px"} w={"24px"} color={iconBoxInside} />
+      </IconBox>
+    </Flex>
+    <Text color="gray.400" fontSize="sm">
+      <Text as="span" color="green.400" fontWeight="bold"></Text>
+      <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+    </Text>
+  </Flex>
+</Card>
+<Card
+  minH="125px"
+  transition="transform 0.3s ease-in-out"
+  _hover={{ transform: "scale(1.05)", cursor: "pointer" }}
+>
+  <Flex direction="column">
+    <Flex flexDirection="row" align="center" justify="center" w="100%" mb="25px">
+      <Stat me="auto">
+        <StatLabel fontSize="xs" color="gray.400" fontWeight="bold" textTransform="uppercase">
+          new entry
+        </StatLabel>
+        <Flex>
+          <StatNumber
+            fontSize="18"
+            color={textColor}
+            fontWeight="bold"
+            position="relative"
+            _hover={{
+              _after: {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                bottom: "-2px",
+                width: "100%",
+                height: "2px",
+                bg: "blue.500", // Blue underline on hover
+                transition: "width 0.3s ease-in-out",
+              },
+            }}
+            _after={{
+              content: '""',
+              position: "absolute",
+              left: 0,
+              bottom: "-2px",
+              width: "0%",
+              height: "2px",
+              bg: "blue.500", // Blue underline color
+              transition: "width 0.3s ease-in-out",
+            }}
+          >
+            Daily Work Report
+          </StatNumber>
+        </Flex>
+      </Stat>
+      <IconBox borderRadius="50%" as="box" h={"45px"} w={"45px"} bg={iconBlue}>
+        <GlobeIcon h={"24px"} w={"24px"} color={iconBoxInside} />
+      </IconBox>
+    </Flex>
+    <Text color="gray.400" fontSize="sm">
+      <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+    </Text>
+  </Flex>
+</Card>
+
       </SimpleGrid>
 
       <Grid templateColumns={{ sm: "1fr", lg: "2fr 1fr" }} templateRows={{ lg: "repeat(2, auto)" }} gap="20px">

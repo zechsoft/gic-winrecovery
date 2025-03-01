@@ -1,13 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
-  Flex, Text, Button, Input, Table, Thead, Tbody, Tr, Th, Td, Avatar, IconButton, Tooltip, Box, 
-  InputGroup, InputLeftElement, Icon, Tabs, TabList, TabPanels, TabPanel, Tab, Modal, ModalOverlay, 
-  ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Select 
-} from "@chakra-ui/react";  // Ensure Tab is imported here
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+  Box,
+  Button,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  IconButton,
+  Tooltip,
+  Input,
+  Select,
+  Flex,
+  Text,
+  InputGroup,
+  InputLeftElement,
+  Tabs,
+  TabList,
+  Tab,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+} from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import { motion } from "framer-motion";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 
 const TABS = [
   { label: "All", value: "all" },
@@ -15,112 +39,91 @@ const TABS = [
   { label: "Unmonitored", value: "unmonitored" },
 ];
 
-const TABLE_HEAD = [
-  "#",
-  "Customer",
-  "Delivery Notice No",
-  "Start Time",
-  "End Time",
-  "Creator",
-  "Urgent Material",
-  "Order Status",
-];
+const CustomerDeliveryNotice = () => {
+  const [tableData, setTableData] = useState([
+    {
+      id: 1,
+      orderNumber: "ON12345",
+      category: "Category A",
+      vendor: "Vendor X",
+      invitee: "John Doe",
+      contact: "john.doe@example.com",
+      sender: "Supplier A",
+      status: "Pending",
+      template: "Template 1",
+    },
+    {
+      id: 2,
+      orderNumber: "ON67890",
+      category: "Category B",
+      vendor: "Vendor Y",
+      invitee: "Jane Smith",
+      contact: "jane.smith@example.com",
+      sender: "Supplier B",
+      status: "Approved",
+      template: "Template 2",
+    },
+  ]);
 
-let TABLE_ROWS = [
-  { id: "1", customer: "John Doe", deliveryNoticeNo: "DN12345", startTime: "10:00 AM", endTime: "12:00 PM", creator: "Jane Smith", urgentMaterial: "Yes", orderStatus: "Pending" },
-  { id: "2", customer: "Jane Smith", deliveryNoticeNo: "DN67890", startTime: "02:00 PM", endTime: "04:00 PM", creator: "John Doe", urgentMaterial: "No", orderStatus: "Completed" },
-];
-
-export function CustomerDeliveryNotice() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(""); 
-  const [secondOrderSearch, setSecondOrderSearch] = useState(""); 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newRowData, setNewRowData] = useState({
-    id: "",
-    customer: "",
-    deliveryNoticeNo: "",
-    startTime: "",
-    endTime: "",
-    creator: "",
-    urgentMaterial: "",
-    orderStatus: "",
-  });
-  const [editRowIndex, setEditRowIndex] = useState(null); 
+  const [searchTerm, setSearchTerm] = useState("");
   const [country, setCountry] = useState("USA");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentRow, setCurrentRow] = useState({});
 
-  const rowsPerPage = 5;
-  const borderColor = "gray.300"; 
+  const searchInputRef = useRef(null);
+  const [isFocused, setIsFocused] = useState(false);
 
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-
-  const filteredRows = TABLE_ROWS.filter(row =>
-    row.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.deliveryNoticeNo.toLowerCase().includes(secondOrderSearch.toLowerCase())
-  );
-
-  const currentRows = filteredRows.slice(indexOfFirstRow, indexOfLastRow);
-
-  const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+  useEffect(() => {
+    if (searchInputRef.current) {
+      setIsFocused(searchInputRef.current === document.activeElement);
     }
-  };
+  }, [searchTerm]);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const openModal = (rowIndex = null) => {
-    setEditRowIndex(rowIndex);
-    if (rowIndex !== null) {
-      setNewRowData(TABLE_ROWS[rowIndex]); 
-    }
+  const handleAddRow = () => {
     setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setNewRowData({
-      id: "",
-      customer: "",
-      deliveryNoticeNo: "",
-      startTime: "",
-      endTime: "",
-      creator: "",
-      urgentMaterial: "",
-      orderStatus: "",
+    setCurrentRow({
+      orderNumber: "",
+      category: "",
+      vendor: "",
+      invitee: "",
+      contact: "",
+      sender: "",
+      status: "Pending",
+      template: "",
     });
-    setEditRowIndex(null);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewRowData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
   };
 
   const handleSaveRow = () => {
-    if (editRowIndex !== null) {
-      TABLE_ROWS[editRowIndex] = newRowData;
+    if (currentRow.id) {
+      // Update existing row
+      const updatedTableData = tableData.map(row => {
+        if (row.id === currentRow.id) {
+          return { ...row, ...currentRow };
+        }
+        return row;
+      });
+      setTableData(updatedTableData);
     } else {
-      TABLE_ROWS.unshift(newRowData); 
+      // Add new row
+      const newRow = {
+        ...currentRow,
+        id: tableData.length + 1, // Generate a new unique ID
+      };
+      setTableData([...tableData, newRow]);
     }
-    closeModal();
+    setIsModalOpen(false);
+    setCurrentRow(undefined);
   };
 
-  const navigate = useHistory();
-
-  const handleViewAllClick = () => {
-    navigate.push('/admin/tables'); 
+  const handleEditRow = (row) => {
+    setIsModalOpen(true);
+    setCurrentRow(row);
   };
+
+  const handleViewAllClick = () => navigate.push("/admin/tables");
+  const handleSearch = () => alert("Search functionality not implemented yet");
+  const handleClear = () => setSearchTerm("");
 
   return (
     <Box mt={16}>
@@ -128,124 +131,208 @@ export function CustomerDeliveryNotice() {
         <Flex justify="space-between" mb={8}>
           <Flex direction="column">
             <Text fontSize="xl" fontWeight="bold">Customer Delivery Notice</Text>
-            <Text fontSize="md" color="gray.500">See information about all customer delivery notices</Text>
+            <Text fontSize="md" color="gray.400">See information about all customer delivery</Text>
           </Flex>
           <Flex direction="row" gap={2}>
-            <Button size="sm" variant="outline" onClick={handleViewAllClick}>
-              View All
-            </Button>
-            <Button size="sm" colorScheme="blue" leftIcon={<UserPlusIcon />} onClick={() => openModal()}>
-              Add New Row
+            <Button size="sm" onClick={handleViewAllClick} mr={2}>View All</Button>
+            <Button size="sm" colorScheme="blue" leftIcon={<UserPlusIcon />} onClick={handleAddRow}>
+              Add Row
             </Button>
           </Flex>
         </Flex>
 
-        <Tabs defaultIndex={0} className="w-full md:w-max" isLazy>
-          <Flex justify="space-between" align="center" mb={4}>
+        <Flex justify="space-between" align="center" mb={4}>
+          <Tabs defaultIndex={0} className="w-full md:w-max" isLazy>
             <TabList>
               {TABS.map(({ label, value }) => (
-                <Tab key={value} value={value} _selected={{ color: 'blue.500', borderColor: 'blue.500' }} _focus={{ outline: 'none' }}>
-                  &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                </Tab>
+                <Tab key={value} value={value}>{label}</Tab>
               ))}
             </TabList>
+          </Tabs>
+          <Flex>
+            <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="Select" width={40} mr={4}>
+              <option value="USA">All</option>
+              <option value="Germany">Germany</option>
+              <option value="Italy">Italy</option>
+              <option value="China">China</option>
+            </Select>
 
-            <Flex direction="row" gap={4} align="center">
-              <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="Select" width={40}>
-                <option value="USA">All</option>
-                <option value="Germany">Germany</option>
-                <option value="Italy">Italy</option>
-                <option value="China">China</option>
-              </Select>
-              <motion.div whileFocus={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
-                <InputGroup>
-                  <InputLeftElement pointerEvents="none">
-                    <MagnifyingGlassIcon style={{ height: "30px", width: "20px", padding: "2.5px", marginTop: "px" }} />
-                  </InputLeftElement>
-                  <Input variant="filled" placeholder="Search here" size="md" borderRadius="lg" width={{ base: "full", lg: "220px" }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} bg="white" borderColor="gray.300" _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px rgba(66,153,225,0.6)" }} />
-                </InputGroup>
-              </motion.div>
-              <Button size="sm" colorScheme="blue" onClick={() => { setSearchTerm(""); setSecondOrderSearch(""); }} marginLeft={4}>
-                Search
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => { setSearchTerm(""); setSecondOrderSearch(""); }} marginLeft={4}>
-                Clear
-              </Button>
-            </Flex>
-          </Flex>
-
-          <TabPanels>
-            <TabPanel>
-              <Box overflowX="auto" borderRadius="md" boxShadow="sm">
-                <Table variant="simple">
-                  <Thead bg="gray.100">
-                    <Tr>
-                      {TABLE_HEAD.map((head) => (
-                        <Th key={head} cursor="pointer" textAlign="center" py={4} fontSize="13px" color="gray.400" borderColor={borderColor}>
-                          <Text fontWeight="bold">{head}</Text>
-                        </Th>
-                      ))}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {currentRows.map((row, index) => (
-                      <Tr key={row.id}>
-                        <Td py={3}>{row.id}</Td>
-                        <Td py={3}>{row.customer}</Td>
-                        <Td py={3}>{row.deliveryNoticeNo}</Td>
-                        <Td py={3}>{row.startTime}</Td>
-                        <Td py={3}>{row.endTime}</Td>
-                        <Td py={3}>{row.creator}</Td>
-                        <Td py={3}>{row.urgentMaterial}</Td>
-                        <Td py={3}>{row.orderStatus}</Td>
-                        <Td py={3}>
-                          <Tooltip label="Edit User">
-                            <IconButton variant="outline" aria-label="Edit" icon={<Icon as={PencilIcon} boxSize={5} />} size="sm" onClick={() => openModal(index)} />
-                          </Tooltip>
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </Box>
-
-              <Flex justify="space-between" align="center" mt={4}>
-                <Text fontSize="sm" color="gray.500">Page {currentPage} of {totalPages}</Text>
-                <Flex gap={2}>
-                  <Button size="sm" variant="outline" onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</Button>
-                  <Button size="sm" variant="outline" onClick={handleNextPage} disabled={currentPage === totalPages}>Next</Button>
-                </Flex>
-              </Flex>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-
-        <Modal isOpen={isModalOpen} onClose={closeModal}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>{editRowIndex !== null ? "Edit Customer Delivery Notice" : "Add New Customer Delivery Notice"}</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              {TABLE_HEAD.slice(0, -1).map((head, index) => (
+            <FormControl width="half" mr={4}>
+              <FormLabel
+                position="absolute"
+                top={isFocused || searchTerm ? "-16px" : "12px"}
+                left="40px"
+                top="9px"
+                color="gray.500"
+                fontSize={isFocused || searchTerm ? "xs" : "sm"}
+                transition="all 0.2s ease"
+                pointerEvents="none"
+                opacity={isFocused || searchTerm ? 0 : 1} // Set opacity to 0 when focused or has value
+              >
+                Search here
+              </FormLabel>
+              <InputGroup>
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon style={{ height: "25px", width: "20px", padding: "2.5px" }} />
+                </InputLeftElement>
                 <Input
-                  key={index}
-                  name={head.toLowerCase().replace(/\s+/g, '')}
-                  placeholder={head}
-                  value={newRowData[head.toLowerCase().replace(/\s+/g, '')]}
-                  onChange={handleInputChange}
-                  mb={3}
+                  ref={searchInputRef}
+                  placeholder=" "
+                  size="md"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  borderColor={isFocused ? "green.500" : "gray.300"}
+                  _focus={{
+                    borderColor: "green.500",
+                    boxShadow: "0 0 0 1px green.500",
+                  }}
                 />
-              ))}
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-              <Button colorScheme="blue" onClick={handleSaveRow}>Save Customer Delivery Notice</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+              </InputGroup>
+            </FormControl>
+            <Button colorScheme="blue" mr={4} onClick={handleSearch}>Search</Button>
+            <Button variant="outline" onClick={handleClear}>Clear</Button>
+          </Flex>
+        </Flex>
+
+        <Table variant="simple" borderRadius="10px" overflow="hidden">
+          <Thead bg="gray.100" height="60px">
+            <Tr>
+              <Th color="gray.400">#</Th>
+              <Th color="gray.400">Order Number</Th>
+              <Th color="gray.400">Material Category</Th>
+              <Th color="gray.400">Vendor</Th>
+              <Th color="gray.400">Invitee</Th>
+              <Th color="gray.400">Host/Inviter Contact Information</Th>
+              <Th color="gray.400">Sender</Th>
+              <Th color="gray.400">Status</Th>
+              <Th color="gray.400">Supplement Template</Th>
+              <Th color="gray.400">Action</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {tableData.map((row) => (
+              <Tr key={row.id}>
+                <Td>{row.id}</Td>
+                <Td>{row.orderNumber}</Td>
+                <Td>{row.category}</Td>
+                <Td>{row.vendor}</Td>
+                <Td>{row.invitee}</Td>
+                <Td>{row.contact}</Td>
+                <Td>{row.sender}</Td>
+                <Td>{row.status}</Td>
+                <Td>{row.template}</Td>
+                <Td>
+                  <Tooltip label="Edit">
+                    <IconButton
+                      variant="outline"
+                      aria-label="Edit"
+                      icon={<PencilIcon />}
+                      size="xs"
+                      onClick={() => handleEditRow(row)}
+                    />
+                  </Tooltip>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+
+        <Flex justify="space-between" align="center" mt={4}>
+          <Text fontSize="sm">Page {currentPage} of 1</Text>
+          <Flex>
+            <Button size="sm" variant="outline" mr={2} isDisabled={currentPage === 1} onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}>Previous</Button>
+            <Button size="sm" variant="outline" isDisabled>Next</Button>
+          </Flex>
+        </Flex>
       </Flex>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add New Row</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Order Number</FormLabel>
+              <Input
+                name="orderNumber"
+                value={currentRow?.orderNumber || ""}
+                onChange={(e) => setCurrentRow({ ...currentRow, orderNumber: e.target.value })}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Material Category</FormLabel>
+              <Input
+                name="category"
+                value={currentRow?.category || ""}
+                onChange={(e) => setCurrentRow({ ...currentRow, category: e.target.value })}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Vendor</FormLabel>
+              <Input
+                name="vendor"
+                value={currentRow?.vendor || ""}
+                onChange={(e) => setCurrentRow({ ...currentRow, vendor: e.target.value })}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Invitee</FormLabel>
+              <Input
+                name="invitee"
+                value={currentRow?.invitee || ""}
+                onChange={(e) => setCurrentRow({ ...currentRow, invitee: e.target.value })}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Host/Inviter Contact</FormLabel>
+              <Input
+                name="contact"
+                value={currentRow?.contact || ""}
+                onChange={(e) => setCurrentRow({ ...currentRow, contact: e.target.value })}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Sender</FormLabel>
+              <Input
+                name="sender"
+                value={currentRow?.sender || ""}
+                onChange={(e) => setCurrentRow({ ...currentRow, sender: e.target.value })}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Status</FormLabel>
+              <Select
+                name="status"
+                value={currentRow?.status || "Pending"}
+                onChange={(e) => setCurrentRow({ ...currentRow, status: e.target.value })}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+              </Select>
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Supplement Template</FormLabel>
+              <Input
+                type="text"
+                name="template"
+                value={currentRow?.template || ""}
+                onChange={(e) => setCurrentRow({ ...currentRow, template: e.target.value })}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleSaveRow}>
+              Save
+            </Button>
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
-}
+};
 
 export default CustomerDeliveryNotice;

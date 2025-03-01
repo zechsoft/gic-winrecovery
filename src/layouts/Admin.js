@@ -1,11 +1,5 @@
-// Chakra imports
-import {
-  Portal,
-  useDisclosure,
-  Stack,
-  Box,
-  useColorMode,
-} from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Portal, useDisclosure, Stack, Box, useColorMode } from "@chakra-ui/react";
 import Configurator from "components/Configurator/Configurator";
 import {
   ArgonLogoDark,
@@ -16,34 +10,33 @@ import {
 // Layout components
 import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
-import React, { useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import routes from "routes.js";
 // Custom Chakra theme
 import FixedPlugin from "../components/FixedPlugin/FixedPlugin";
 import ShiprocketChatbot from "../components/FixedPlugin/ShiprocketChatbot";
-import Side from "../components/FixedPlugin/IconSidebar";
-import "../components/FixedPlugin/Chatbot.css"
-
+import IconSidebar from "components/FixedPlugin/IconSidebar";
+import "../components/FixedPlugin/Chatbot.css";
 // Custom components
 import MainPanel from "../components/Layout/MainPanel";
 import PanelContainer from "../components/Layout/PanelContainer";
 import PanelContent from "../components/Layout/PanelContent";
 import bgAdmin from "assets/img/admin-background.png";
+// Import SidebarProvider
+import { SidebarProvider } from "contexts/SidebarContext";
 
-export default function Dashboard(props) {
+export default function Admin(props) {
   const { ...rest } = props;
-  // states and functions
   const [fixed, setFixed] = useState(false);
   const { colorMode } = useColorMode();
-  
-  // functions for changing the states from components
+
+  // Functions for getting active route and navbar
   const getRoute = () => {
     return window.location.pathname !== "/admin/full-screen-maps";
   };
 
   const getActiveRoute = (routes) => {
-    let activeRoute = "Default Brand Text";
+    let activeRoute = "Admin Dashboard";
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].collapse) {
         let collapseActiveRoute = getActiveRoute(routes[i].views);
@@ -56,9 +49,7 @@ export default function Dashboard(props) {
           return categoryActiveRoute;
         }
       } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
+        if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
           return routes[i].name;
         }
       }
@@ -75,9 +66,7 @@ export default function Dashboard(props) {
           return categoryActiveNavbar;
         }
       } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
+        if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
           if (routes[i].secondaryNavbar) {
             return routes[i].secondaryNavbar;
           }
@@ -112,99 +101,84 @@ export default function Dashboard(props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   document.documentElement.dir = "ltr";
 
-  // Chakra Color Mode
   return (
-    <Box>
-      <Box
-        minH="40vh"
-        w="100%"
-        position="absolute"
-        bgImage={colorMode === "light" ? bgAdmin : "none"}
-        bg={colorMode === "light" ? bgAdmin : "navy.900"}
-        bgSize="cover"
-        top="0"
-      />
-      <Sidebar
-        routes={routes}
-        logo={
-          <Stack direction="row" spacing="12px" align="center" justify="center">
-            {colorMode === "dark" ? (
-              <ArgonLogoLight w="74px" h="27px" />
-            ) : (
-              <ArgonLogoDark w="74px" h="27px" />
-            )}
-            <Box
-              w="1px"
-              h="20px"
-              bg={colorMode === "dark" ? "white" : "gray.700"}
-            />
-            {colorMode === "dark" ? (
-              <ChakraLogoLight w="82px" h="21px" />
-            ) : (
-              <ChakraLogoDark w="82px" h="21px" />
-            )}
-          </Stack>
-        }
-        display="none"
-        {...rest}
-      />
-      <MainPanel
-        w={{
-          base: "100%",
-          xl: "calc(100% - 275px)",
-        }}
-      >
-        <Portal>
-          <AdminNavbar
-            onOpen={onOpen}
-            brandText={getActiveRoute(routes)}
-            secondary={getActiveNavbar(routes)}
-            fixed={fixed}
-            {...rest}
-          />
-        </Portal>
-        {getRoute() ? (
-          <PanelContent>
-            <PanelContainer>
-              <Switch>
-                {getRoutes(routes)}
-                <Redirect from="/admin" to="/admin/dashboard" />
-              </Switch>
-            </PanelContainer>
-          </PanelContent>
-        ) : null}
-        <Portal>
-          <FixedPlugin
-            secondary={getActiveNavbar(routes)}
-            fixed={fixed}
-            onOpen={onOpen}
-          />
-        </Portal>
-
-        <Configurator
-          secondary={getActiveNavbar(routes)}
-          isOpen={isOpen}
-          onClose={onClose}
-          isChecked={fixed}
-          onSwitch={(value) => {
-            setFixed(value);
-          }}
+    // Wrap the entire component with SidebarProvider
+    <SidebarProvider>
+      <Box>
+        <Box
+          minH="40vh"
+          w="100%"
+          position="absolute"
+          bgImage={colorMode === "light" ? bgAdmin : "none"}
+          bg={colorMode === "light" ? bgAdmin : "navy.900"}
+          bgSize="cover"
+          top="0"
         />
-        
-  {/* Position Side in the middle-bottom */}
-  <Box position="fixed" top="25%" right="0px" transform="translateY(-20%)" zIndex="9999">
-  <Side />
-</Box>
+        {/* Sidebar component now uses context */}
+        <Sidebar
+          routes={routes}
+          logo={
+            <Stack direction="row" spacing="12px" align="center" justify="center">
+              {colorMode === "dark" ? (
+                <ArgonLogoLight w="74px" h="27px" />
+              ) : (
+                <ArgonLogoDark w="74px" h="27px" />
+              )}
+              <Box w="1px" h="20px" bg={colorMode === "dark" ? "white" : "gray.700"} />
+              {colorMode === "dark" ? (
+                <ChakraLogoLight w="82px" h="21px" />
+              ) : (
+                <ChakraLogoDark w="82px" h="21px" />
+              )}
+            </Stack>
+          }
+          display="block"
+          {...rest}
+        />
+        <MainPanel w="100%">
+          <Portal>
+            <AdminNavbar
+              onOpen={onOpen}
+              brandText={getActiveRoute(routes)}
+              secondary={getActiveNavbar(routes)}
+              fixed={fixed}
+              {...rest}
+            />
+          </Portal>
+          {getRoute() ? (
+            <PanelContent>
+              <PanelContainer>
+                <Switch>
+                  {getRoutes(routes)}
+                  <Redirect from="/admin" to="/admin/dashboard" />
+                </Switch>
+              </PanelContainer>
+            </PanelContent>
+          ) : null}
+          <Portal>
+            <FixedPlugin
+              secondary={getActiveNavbar(routes)}
+              fixed={fixed}
+              onOpen={onOpen}
+            />
+          </Portal>
 
+          <Configurator
+            secondary={getActiveNavbar(routes)}
+            isOpen={isOpen}
+            onClose={onClose}
+            isChecked={fixed}
+            onSwitch={(value) => setFixed(value)}
+          />
+          <Box position="fixed" bottom="78%" right="0px" transform="translateY(50%)" zIndex="9999">
+          <IconSidebar basePath="/admin" />
+          </Box>
 
-
-{/* Keep ShiprocketChatbot at the bottom-left */}
-<Box position="fixed" bottom="20px" left="22px" zIndex="9999">
-  <ShiprocketChatbot />
-</Box>
-
-
-      </MainPanel>
-    </Box>
+          <Box position="fixed" bottom="20px" left="20px" zIndex="9999">
+            <ShiprocketChatbot />
+          </Box>
+        </MainPanel>
+      </Box>
+    </SidebarProvider>
   );
 }

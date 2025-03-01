@@ -162,13 +162,15 @@ function Profile() {
         borderColor={borderProfileColor}
         bg={bgProfile}
         p="24px"
-        borderRadius="20px">
+        borderRadius="20px"
+      >
         <Flex
           align="center"
           mb={{ sm: "10px", md: "0px" }}
           direction={{ sm: "column", md: "row" }}
           w={{ sm: "100%" }}
-          textAlign={{ sm: "center", md: "start" }}>
+          textAlign={{ sm: "center", md: "start" }}
+        >
           <Avatar
             me={{ md: "22px" }}
             src={profileImage}
@@ -181,21 +183,29 @@ function Profile() {
               fontSize={{ sm: "lg", lg: "xl" }}
               color={textColor}
               fontWeight="bold"
-              ms={{ sm: "8px", md: "0px" }}>
+              ms={{ sm: "8px", md: "0px" }}
+            >
               {profileInfo.fullName}
             </Text>
             <Text
               fontSize={{ sm: "sm", md: "md" }}
               color={emailColor}
-              fontWeight="semibold">
+              fontWeight="semibold"
+            >
               {profileInfo.email}
             </Text>
           </Flex>
         </Flex>
         <Flex
           direction={{ sm: "column", lg: "row" }}
-          w={{ sm: "100%", md: "50%", lg: "auto" }}>
-          <Button p="0px" bg="transparent" variant="no-effects" onClick={() => setActiveSection("overview")}>
+          w={{ sm: "100%", md: "50%", lg: "auto" }}
+        >
+          <Button
+            p="0px"
+            bg="transparent"
+            variant="no-effects"
+            onClick={() => setActiveSection("overview")}
+          >
             <Flex
               align="center"
               w={{ sm: "100%", lg: "135px" }}
@@ -204,14 +214,20 @@ function Profile() {
               justifyContent="center"
               py="10px"
               boxShadow="0px 2px 5.5px rgba(0, 0, 0, 0.06)"
-              cursor="pointer">
+              cursor="pointer"
+            >
               <Icon color={textColor} as={FaCube} me="6px" />
               <Text fontSize="xs" color={textColor} fontWeight="bold">
                 OVERVIEW
               </Text>
             </Flex>
           </Button>
-          <Button p="0px" bg="transparent" variant="no-effects" onClick={() => setActiveSection("info")}>
+          <Button
+            p="0px"
+            bg="transparent"
+            variant="no-effects"
+            onClick={() => setActiveSection("info")}
+          >
             <Flex
               align="center"
               w={{ lg: "135px" }}
@@ -221,14 +237,20 @@ function Profile() {
               mx={{ lg: "1rem" }}
               bg={activeSection === "info" ? "#fff" : "transparent"}
               boxShadow="0px 2px 5.5px rgba(0, 0, 0, 0.06)"
-              cursor="pointer">
+              cursor="pointer"
+            >
               <Icon color={textColor} as={IoDocumentsSharp} me="6px" />
               <Text fontSize="xs" color={textColor} fontWeight="bold">
                 INFO
               </Text>
             </Flex>
           </Button>
-          <Button p="0px" bg="transparent" variant="no-effects" onClick={() => setActiveSection("projects")}>
+          <Button
+            p="0px"
+            bg="transparent"
+            variant="no-effects"
+            onClick={() => setActiveSection("projects")}
+          >
             <Flex
               align="center"
               w={{ lg: "135px" }}
@@ -237,7 +259,8 @@ function Profile() {
               py="10px"
               boxShadow="0px 2px 5.5px rgba(0, 0, 0, 0.06)"
               bg={activeSection === "projects" ? "#fff" : "transparent"}
-              cursor="pointer">
+              cursor="pointer"
+            >
               <Icon color={textColor} as={FaPenFancy} me="6px" />
               <Text fontSize="xs" color={textColor} fontWeight="bold">
                 PROJECTS
@@ -248,7 +271,7 @@ function Profile() {
       </Flex>
 
       {activeSection === "overview" && (
-        <Grid templateColumns={{ sm: "1fr", xl: "repeat(3, 1fr)" }} gap="22px">
+        <Grid templateColumns={{ sm: "1fr", xl: "1fr" }} gap="22px">
           <Card p="16px" my={{ sm: "24px", xl: "0px" }}>
             <CardHeader p="12px 5px" mb="12px">
               <Text fontSize="lg" color={textColor} fontWeight="bold">
@@ -268,46 +291,7 @@ function Profile() {
                     {profileInfo.fullName}
                   </Text>
                 </Flex>
-                <Flex align="center" mb="18px">
-                  <Text fontSize="md" color={textColor} fontWeight="bold" me="10px">
-                    Mobile:{" "}
-                  </Text>
-                  <Text fontSize="md" color="gray.400" fontWeight="400">
-                    {profileInfo.mobile}
-                  </Text>
-                </Flex>
-                <Flex align="center" mb="18px">
-                  <Text fontSize="md" color={textColor} fontWeight="bold" me="10px">
-                    Email:{" "}
-                  </Text>
-                  <Text fontSize="md" color="gray.400" fontWeight="400">
-                    {profileInfo.email}
-                  </Text>
-                </Flex>
-                <Flex align="center" mb="18px">
-                  <Text fontSize="md" color={textColor} fontWeight="bold" me="10px">
-                    Location:{" "}
-                  </Text>
-                  <Text fontSize="md" color="gray.400" fontWeight="400">
-                    {profileInfo.location}
-                  </Text>
-                </Flex>
-                <Flex align="center" mb="18px">
-                  <Text fontSize="md" color={textColor} fontWeight="bold" me="10px">
-                    Social Media:{" "}
-                  </Text>
-                  <Flex>
-                    <Link href="#" color={iconColor} fontSize="lg" me="10px" _hover={{ color: "blue.500" }}>
-                      <Icon as={FaFacebook} />
-                    </Link>
-                    <Link href="#" color={iconColor} fontSize="lg" me="10px" _hover={{ color: "blue.500" }}>
-                      <Icon as={FaInstagram} />
-                    </Link>
-                    <Link href="#" color={iconColor} fontSize="lg" me="10px" _hover={{ color: "blue.500" }}>
-                      <Icon as={FaTwitter} />
-                    </Link>
-                  </Flex>
-                </Flex>
+                {/* ... other profile info fields ... */}
               </Flex>
             </CardBody>
           </Card>
@@ -324,9 +308,9 @@ function Profile() {
             </CardHeader>
             <CardBody px="5px">
               <Grid
-                templateColumns={{ sm: "1fr", md: "1fr 1fr", xl: "repeat(4, 1fr)" }}
-                templateRows={{ sm: "1fr 1fr 1fr auto", md: "1fr 1fr", xl: "1fr" }}
-                gap="24px">
+                templateColumns={{ sm: "1fr", md: "1fr", xl: "1fr" }}
+                gap="24px"
+              >
                 {projects.map((project, index) => (
                   <Flex direction="column" key={index} onClick={() => handleProjectClick(project)}>
                     <Box mb="20px" position="relative" borderRadius="15px">
@@ -337,7 +321,8 @@ function Profile() {
                         position="absolute"
                         top="0"
                         borderRadius="15px"
-                        bg="linear-gradient(360deg, rgba(49, 56, 96, 0.16) 0%, rgba(21, 25, 40, 0.88) 100%)"></Box>
+                        bg="linear-gradient(360deg, rgba(49, 56, 96, 0.16) 0%, rgba(21, 25, 40, 0.88) 100%)"
+                      ></Box>
                     </Box>
                     <Flex direction="column">
                       <Text fontSize="md" color="gray.400" fontWeight="600" mb="10px">
@@ -367,164 +352,6 @@ function Profile() {
             </CardBody>
           </Card>
         </Grid>
-      )}
-
-      {activeSection === "info" && (
-        <Card p="16px" my="24px">
-          <CardHeader p="12px 5px" mb="12px">
-            <Flex justify="space-between" align="center">
-              <Text fontSize="lg" color={textColor} fontWeight="bold">
-                Edit Profile Information
-              </Text>
-              <Button onClick={handleEditClick} colorScheme="blue" size="sm">
-                {isEditing ? "Save" : "Edit"}
-              </Button>
-            </Flex>
-          </CardHeader>
-          <CardBody px="5px">
-            <Flex direction="column">
-              <Input
-                name="fullName"
-                value={profileInfo.fullName}
-                onChange={handleProfileInfoChange}
-                isDisabled={!isEditing}
-                mb="18px"
-              />
-              <Input
-                name="mobile"
-                value={profileInfo.mobile}
-                onChange={handleProfileInfoChange}
-                isDisabled={!isEditing}
-                mb="18px"
-              />
-              <Input
-                name="email"
-                value={profileInfo.email}
-                onChange={handleProfileInfoChange}
-                isDisabled={!isEditing}
-                mb="18px"
-              />
-              <Input
-                name="location"
-                value={profileInfo.location}
-                onChange={handleProfileInfoChange}
-                isDisabled={!isEditing}
-                mb="18px"
-              />
-              <Textarea
-                name="bio"
-                value={profileInfo.bio}
-                onChange={handleProfileInfoChange}
-                isDisabled={!isEditing}
-                mb="18px"
-              />
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                isDisabled={!isEditing}
-                mb="18px"
-              />
-            </Flex>
-          </CardBody>
-        </Card>
-      )}
-
-      {activeSection === "projects" && (
-        <Card p="16px" my="24px">
-          <CardHeader p="12px 5px" mb="12px">
-            <Flex direction="column">
-              <Text fontSize="lg" color={textColor} fontWeight="bold">
-                Projects
-              </Text>
-              <Text fontSize="sm" color="gray.400" fontWeight="400">
-                Architects design houses
-              </Text>
-            </Flex>
-          </CardHeader>
-          <CardBody px="5px">
-            <Grid
-              templateColumns={{ sm: "1fr", md: "1fr 1fr", xl: "repeat(4, 1fr)" }}
-              templateRows={{ sm: "1fr 1fr 1fr auto", md: "1fr 1fr", xl: "1fr" }}
-              gap="24px">
-              {projects.map((project, index) => (
-                <Flex direction="column" key={index} onClick={() => handleProjectClick(project)}>
-                  <Box mb="20px" position="relative" borderRadius="15px">
-                    <Image src={project.image} borderRadius="15px" />
-                    <Box
-                      w="100%"
-                      h="100%"
-                      position="absolute"
-                      top="0"
-                      borderRadius="15px"
-                      bg="linear-gradient(360deg, rgba(49, 56, 96, 0.16) 0%, rgba(21, 25, 40, 0.88) 100%)"></Box>
-                  </Box>
-                  <Flex direction="column">
-                    <Text fontSize="md" color="gray.400" fontWeight="600" mb="10px">
-                      Project #{index + 1}
-                    </Text>
-                    <Text fontSize="xl" color={textColor} fontWeight="bold" mb="10px">
-                      {project.name}
-                    </Text>
-                    <Text fontSize="md" color="gray.400" fontWeight="400" mb="20px">
-                      {project.description}
-                    </Text>
-                    <Flex justifyContent="space-between">
-                      <Button variant="dark" minW="110px" h="36px" onClick={() => handleProjectEditClick(project)}>
-                        EDIT
-                      </Button>
-                      <AvatarGroup size="xs">
-                        <Avatar name="Ryan Florence" src={avatar6} />
-                        <Avatar name="Segun Adebayo" src={avatar2} />
-                        <Avatar name="Kent Dodds" src={avatar3} />
-                        <Avatar name="Prosper Otemuyiwa" src={avatar4} />
-                      </AvatarGroup>
-                    </Flex>
-                  </Flex>
-                </Flex>
-              ))}
-            </Grid>
-          </CardBody>
-        </Card>
-      )}
-
-      {isEditing && selectedProject && (
-        <Modal isOpen={isEditing} onClose={() => setIsEditing(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Edit Project</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Input
-                name="name"
-                value={selectedProject.name}
-                onChange={handleProjectChange}
-                mb="18px"
-                placeholder="Project Name"
-              />
-              <Textarea
-                name="description"
-                value={selectedProject.description}
-                onChange={handleProjectChange}
-                mb="18px"
-                placeholder="Project Description"
-              />
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleProjectImageUpload}
-                mb="18px"
-                placeholder="Upload Project Image"
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={handleSaveProject}>
-                Save
-              </Button>
-              <Button onClick={() => setIsEditing(false)}>Cancel</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       )}
     </Flex>
   );

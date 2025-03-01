@@ -2,15 +2,15 @@ import React, { Component } from 'react';
 import Dashboard from "views/Dashboard/Dashboard.js";
 import Tables from "views/Dashboard/Tables.js";
 import SupplierInfo from "views/Dashboard/SupplierInfo.js";
+
 import CustomerOrder from "views/Dashboard/CustomerOrder.js";
 import Profile from "views/Dashboard/Profile.js";
 import SignIn from "views/Pages/SignIn.js";
-import SignUp from "views/Pages/SignUp.js";
+import SignUp from "views/Pages/SignUp.js"; // Import Sign Up component
 import MaterialReplenishment from "views/Dashboard/MaterialReplenishment.js"; 
 import MaterialInquiry from "views/Dashboard/MaterialInquiry.js";
 import CustomerDeliveryNotice from "views/Dashboard/CustomerDeliveryNotice.js";
 import DailyWorkReport from "views/Dashboard/DailyWorkReport.js";
-
 
 import {
   HomeIcon,
@@ -40,6 +40,7 @@ var dashRoutes = [
     component: Profile,
     layout: "/admin",
   },
+  
   {
     name: "Tables",
     category: "account",
@@ -56,45 +57,43 @@ var dashRoutes = [
         layout: "/admin",
       },
       {
-        path: "/customer-order",  // Updated path
-        name: "Customer Order",  // Updated name
+        path: "/customer-order",
+        name: "Customer Order",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
         secondaryNavbar: true,
-        component: CustomerOrder,  // Updated component name
+        component: CustomerOrder,
         layout: "/admin",
       },
       {
-        path: "/material-inquiry",  // Updated path
-        name: "Material Inquiry",  // Updated name
+        path: "/material-inquiry",
+        name: "Material Inquiry",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
         secondaryNavbar: true,
-        component: MaterialInquiry,  // Updated component name
+        component: MaterialInquiry,
         layout: "/admin",
       },
       {
-        path: "/material-replenishment",  // Updated path
-        name: "Material Replenish",  // Added line break
+        path: "/material-replenishment",
+        name: "Material Replenish",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
         secondaryNavbar: true,
-        component: MaterialReplenishment,  // Updated component name
+        component: MaterialReplenishment,
         layout: "/admin",
       },
       {
-        path: "/customer-delivery-notice",  // Updated path
-        name: "Customer Delivery",  // Updated name
+        path: "/customer-delivery-notice",
+        name: "Customer Delivery",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
         secondaryNavbar: true,
-        component: CustomerDeliveryNotice,  // Updated component name
+        component: CustomerDeliveryNotice,
         layout: "/admin",
       },
-
     ],
   },
-  
   {
     path: "/daily-work-report",
     name: "Daily Work",
@@ -123,7 +122,7 @@ var dashRoutes = [
   },
   {
     path: "/signup",
-    name: "Sign In",
+    name: "Sign Up",
     rtlName: "لوحة القيادة",
     icon: <DocumentIcon color='inherit' />,
     component: SignUp,

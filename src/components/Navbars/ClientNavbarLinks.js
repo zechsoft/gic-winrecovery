@@ -1,13 +1,31 @@
-import { BellIcon } from "@chakra-ui/icons";
+import React, { useState, useContext } from "react";
+import { BellIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
-  Box, Button,
+  Box,
+  Button,
   Flex,
   Menu,
   MenuButton,
   MenuItem,
-  MenuList, Stack, Text, useColorMode,
-  useColorModeValue
-} from "@chakra-ui/react";
+  MenuList,
+  Stack,
+  Text,
+  useColorMode,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Avatar,
+  useBreakpointValue,
+  FormControl, // Add this import
+  FormLabel,   // Add this import
+} from "@chakra-ui/react"; // Ensure FormControl and FormLabel are imported
+import { NavLink } from "react-router-dom";
+import routes from "clientroutes"; // Ensure this is the correct path for client routes
 import avatar1 from "assets/img/avatars/avatar1.png";
 import avatar2 from "assets/img/avatars/avatar2.png";
 import avatar3 from "assets/img/avatars/avatar3.png";
@@ -15,11 +33,9 @@ import { ArgonLogoDark, ArgonLogoLight, ChakraLogoDark, ChakraLogoLight, Profile
 import { ItemContent } from "components/Menu/ItemContent";
 import { SearchBar } from "components/Navbars/SearchBar/SearchBar";
 import { SidebarResponsive } from "components/Sidebar/Sidebar";
-import React from "react";
-import { NavLink } from "react-router-dom";
-import routes from "routes.js";
+import { SidebarContext } from "contexts/SidebarContext";
 
-export default function HeaderLinks(props) {
+export default function ClientNavbarLinks(props) {
   const {
     variant,
     children,
@@ -31,10 +47,54 @@ export default function HeaderLinks(props) {
   } = props;
 
   const { colorMode } = useColorMode();
+  const { toggleSidebar } = useContext(SidebarContext);
 
-  // Always set navbarIcon color to white for right-side elements
-  const navbarIcon = "white"; // Force navbar icon color to white
-  const menuBg = "white"; // Ensure the menu background stays white
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const openLoginModal = (user) => {
+    setCurrentUser(user);
+    setIsLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  const handleLogin = (user) => {
+    setUser(user);
+    setIsLoggedIn(true);
+    closeLoginModal();
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setIsLoggedIn(false);
+  };
+
+  const navbarIcon = "white";
+  const menuBg = "white";
+
+  const users = [
+    {
+      name: 'Client1',
+      avatar: avatar1,
+    },
+    {
+      name: 'Client2',
+      avatar: avatar2,
+    },
+    {
+      name: 'Client3',
+      avatar: avatar3,
+    }
+  ];
+
+  const isMobileView = useBreakpointValue({ base: true, md: false });
+  const isDesktopView = useBreakpointValue({ base: false, lg: true });
 
   return (
     <Flex
@@ -44,51 +104,60 @@ export default function HeaderLinks(props) {
       flexDirection='row'>
       <SearchBar me='18px' />
 
-      {/* Container for right side items */}
       <Box ml="auto" display="flex" alignItems="center">
-        <NavLink to='/auth/signin'>
+        {(isMobileView || isDesktopView) && (
           <Button
-            ms='0px'
-            px='0px'
-            me={{ sm: "2px", md: "16px" }}
-            color={navbarIcon} // Always white
-            variant='no-effects'
-            rightIcon={
-              document.documentElement.dir ? (
-                ""
-              ) : (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              )
-            }
-            leftIcon={
-              document.documentElement.dir ? (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              ) : (
-                ""
-              )
-            }>
-            <Text display={{ sm: "none", md: "flex" }} color={navbarIcon}>Sign In</Text>
+            onClick={toggleSidebar}
+            variant="no-hover"
+            ref={props.btnRef}
+            p="0px"
+            borderRadius="50%"
+            mr={{ base: "16px", lg: "24px" }}
+            bg="white"
+            _hover={{ bg: "white" }}
+            boxShadow="0px 0px 5px rgba(0, 0, 0, 0.1)"
+          >
+            <HamburgerIcon w="25px" h="25px" color="black" />
           </Button>
-        </NavLink>
+        )}
+
+        <Menu>
+          <MenuButton>
+            {isLoggedIn ? (
+              <Button
+                ms='0px'
+                px='0px'
+                me={{ sm: "2px", md: "16px" }}
+                color={navbarIcon}
+                variant='no-effects'
+                rightIcon={document.documentElement.dir ? "" : <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />}
+                leftIcon={document.documentElement.dir ? <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' /> : ""}>
+                <Text display={{ sm: "none", md: "flex" }} color={navbarIcon}>{user.name}</Text>
+              </Button>
+            ) : (
+              <Button
+                ms='0px'
+                px='0px'
+                me={{ sm: "2px", md: "16px" }}
+                color={navbarIcon}
+                variant='no-effects'
+                rightIcon={document.documentElement.dir ? "" : <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />}
+                leftIcon={document.documentElement.dir ? <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' /> : ""}>
+                <Text display={{ sm: "none", md: "flex" }} color={navbarIcon}>Profile</Text>
+              </Button>
+            )}
+          </MenuButton>
+         
+        </Menu>
 
         <SidebarResponsive
           logo={
             <Stack direction='row' spacing='12px' align='center' justify='center'>
-            {colorMode === "dark" ? (
-              <ArgonLogoLight w='74px' h='27px' />
-            ) : (
-              <ArgonLogoDark w='74px' h='27px' />
-            )}
-            <Box
-              w='1px'
-              h='20px'
-              bg={colorMode === "dark" ? "white" : "gray.700"}
-            />
-            {colorMode === "dark" ? (
-              <ChakraLogoLight w='82px' h='21px' />
-            ) : (
-              <ChakraLogoDark w='82px' h='21px' />
-            )}
+              {colorMode === "dark" ? (
+                <ArgonLogoLight w='74px' h='27px' />
+              ) : (
+                <ArgonLogoLight w='74px' h='27px' />
+              )}
             </Stack>
           }
           colorMode={colorMode}
@@ -102,13 +171,14 @@ export default function HeaderLinks(props) {
           ms={{ base: "16px", xl: "0px" }}
           me='16px'
           onClick={props.onOpen}
-          color={navbarIcon} // Always white
+          color={navbarIcon}
           w='25px'
           h='25px'
         />
-
-       
       </Box>
+
+      {/* Updated Login Modal */}
+      
     </Flex>
   );
 }
