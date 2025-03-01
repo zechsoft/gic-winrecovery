@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -29,7 +29,7 @@ import {
   FormControl,
   FormLabel,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { useHistory } from "react-router-dom";
 
@@ -43,33 +43,50 @@ const CustomerDeliveryNotice = () => {
   const [tableData, setTableData] = useState([
     {
       id: 1,
-      orderNumber: "ON12345",
-      category: "Category A",
+      orderNumber: "123",
+      materialCategory: "Category A",
       vendor: "Vendor X",
       invitee: "John Doe",
-      contact: "john.doe@example.com",
-      sender: "Supplier A",
-      status: "Pending",
-      template: "Template 1",
+      hostInviterContactInfo: "123-456-7890",
+      sender: "Alice",
+      status: "Active",
+      supplementTemplate: "Template 1",
+      createTime: "2023-04-18",
+      updateTime: "2023-04-18",
     },
     {
       id: 2,
-      orderNumber: "ON67890",
-      category: "Category B",
+      orderNumber: "124",
+      materialCategory: "Category B",
       vendor: "Vendor Y",
       invitee: "Jane Smith",
-      contact: "jane.smith@example.com",
-      sender: "Supplier B",
-      status: "Approved",
-      template: "Template 2",
+      hostInviterContactInfo: "987-654-3210",
+      sender: "Bob",
+      status: "Inactive",
+      supplementTemplate: "Template 2",
+      createTime: "2023-04-19",
+      updateTime: "2023-04-19",
     },
   ]);
 
+  const [filteredData, setFilteredData] = useState(tableData); // New state for filtered data
   const [searchTerm, setSearchTerm] = useState("");
-  const [country, setCountry] = useState("USA");
+  const [country, setCountry] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentRow, setCurrentRow] = useState({});
+  const [newRow, setNewRow] = useState({
+    orderNumber: "",
+    materialCategory: "",
+    vendor: "",
+    invitee: "",
+    hostInviterContactInfo: "",
+    sender: "",
+    status: "",
+    supplementTemplate: "",
+    createTime: "",
+    updateTime: "",
+  });
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
   const searchInputRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -82,56 +99,104 @@ const CustomerDeliveryNotice = () => {
 
   const handleAddRow = () => {
     setIsModalOpen(true);
-    setCurrentRow({
-      orderNumber: "",
-      category: "",
-      vendor: "",
-      invitee: "",
-      contact: "",
-      sender: "",
-      status: "Pending",
-      template: "",
-    });
+    setSelectedRowId(null);
+  };
+
+  const handleEditRow = (rowId) => {
+    const selectedRow = tableData.find((row) => row.id === rowId);
+    if (selectedRow) {
+      setNewRow(selectedRow);
+      setSelectedRowId(rowId);
+      setIsModalOpen(true);
+    }
   };
 
   const handleSaveRow = () => {
-    if (currentRow.id) {
-      // Update existing row
-      const updatedTableData = tableData.map(row => {
-        if (row.id === currentRow.id) {
-          return { ...row, ...currentRow };
-        }
-        return row;
-      });
+    if (selectedRowId) {
+      const updatedTableData = tableData.map((row) =>
+        row.id === selectedRowId ? { ...row, ...newRow } : row
+      );
       setTableData(updatedTableData);
+      setFilteredData(updatedTableData); // Update filteredData as well
+      setSelectedRowId(null);
     } else {
-      // Add new row
-      const newRow = {
-        ...currentRow,
-        id: tableData.length + 1, // Generate a new unique ID
-      };
-      setTableData([...tableData, newRow]);
+      const updatedRow = { ...newRow, id: tableData.length + 1 };
+      setTableData([...tableData, updatedRow]);
+      setFilteredData([...filteredData, updatedRow]); // Update filteredData as well
     }
     setIsModalOpen(false);
-    setCurrentRow(undefined);
+    setNewRow({
+      orderNumber: "",
+      materialCategory: "",
+      vendor: "",
+      invitee: "",
+      hostInviterContactInfo: "",
+      sender: "",
+      status: "",
+      supplementTemplate: "",
+      createTime: "",
+      updateTime: "",
+    });
   };
 
-  const handleEditRow = (row) => {
-    setIsModalOpen(true);
-    setCurrentRow(row);
-  };
-
+  const navigate = useHistory();
   const handleViewAllClick = () => navigate.push("/admin/tables");
-  const handleSearch = () => alert("Search functionality not implemented yet");
-  const handleClear = () => setSearchTerm("");
+
+  const handleSearch = () => {
+    if (country === "All") {
+      // Search in all columns
+      const filteredData = tableData.filter((row) =>
+        row.orderNumber.includes(searchTerm) ||
+        row.materialCategory.includes(searchTerm) ||
+        row.vendor.includes(searchTerm) ||
+        row.invitee.includes(searchTerm) ||
+        row.hostInviterContactInfo.includes(searchTerm) ||
+        row.sender.includes(searchTerm) ||
+        row.status.includes(searchTerm) ||
+        row.supplementTemplate.includes(searchTerm)
+      );
+      setFilteredData(filteredData);
+    } else {
+      // Search in specific column
+      const filteredData = tableData.filter((row) => {
+        switch (country) {
+          case "Order Number":
+            return row.orderNumber.includes(searchTerm);
+          case "Material Category":
+            return row.materialCategory.includes(searchTerm);
+          case "Vendor":
+            return row.vendor.includes(searchTerm);
+          case "Invitee":
+            return row.invitee.includes(searchTerm);
+          case "Host/Inviter Contact Information":
+            return row.hostInviterContactInfo.includes(searchTerm);
+          case "Sender":
+            return row.sender.includes(searchTerm);
+          case "Status":
+            return row.status.includes(searchTerm);
+          case "Supplement Template":
+            return row.supplementTemplate.includes(searchTerm);
+          default:
+            return true;
+        }
+      });
+      setFilteredData(filteredData);
+    }
+  };
+
+  const handleClear = () => {
+    setSearchTerm("");
+    setCountry("All");
+    setFilteredData(tableData); // Reset to original data
+  };
 
   return (
     <Box mt={16}>
-      <Flex direction="column" bg="white" p={6} boxShadow="md" borderRadius="15px" maxWidth="1200px" mx="auto">
+      <Flex direction="column" bg="white" p={6} boxShadow="md" borderRadius="15px" width="100%">
         <Flex justify="space-between" mb={8}>
           <Flex direction="column">
             <Text fontSize="xl" fontWeight="bold">Customer Delivery Notice</Text>
-            <Text fontSize="md" color="gray.400">See information about all customer delivery</Text>
+            <Text fontSize="md" color="gray.400">Manage Customer Delivery Notice</Text>
           </Flex>
           <Flex direction="row" gap={2}>
             <Button size="sm" onClick={handleViewAllClick} mr={2}>View All</Button>
@@ -150,19 +215,22 @@ const CustomerDeliveryNotice = () => {
             </TabList>
           </Tabs>
           <Flex>
-            <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="Select" width={40} mr={4}>
-              <option value="USA">All</option>
-              <option value="Germany">Germany</option>
-              <option value="Italy">Italy</option>
-              <option value="China">China</option>
+            <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="" width={40} mr={4}>
+              <option value="All">All</option>
+              <option value="Order Number">Order Number</option>
+              <option value="Material Category">Material Category</option>
+              <option value="Vendor">Vendor</option>
+              <option value="Invitee">Invitee</option>
+              <option value="Host/Inviter Contact Information">Host/Inviter Contact Information</option>
+              <option value="Sender">Sender</option>
+              <option value="Status">Status</option>
+              <option value="Supplement Template">Supplement Template</option>
             </Select>
-
             <FormControl width="half" mr={4}>
               <FormLabel
                 position="absolute"
                 top={isFocused || searchTerm ? "-16px" : "12px"}
                 left="40px"
-                top="9px"
                 color="gray.500"
                 fontSize={isFocused || searchTerm ? "xs" : "sm"}
                 transition="all 0.2s ease"
@@ -173,11 +241,10 @@ const CustomerDeliveryNotice = () => {
               </FormLabel>
               <InputGroup>
                 <InputLeftElement pointerEvents="none">
-                  <SearchIcon style={{ height: "25px", width: "20px", padding: "2.5px" }} />
+                  <MagnifyingGlassIcon style={{ height: "25px", width: "20px", padding: "2.5px" }} />
                 </InputLeftElement>
                 <Input
                   ref={searchInputRef}
-                  placeholder=" "
                   size="md"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -196,48 +263,51 @@ const CustomerDeliveryNotice = () => {
           </Flex>
         </Flex>
 
-        <Table variant="simple" borderRadius="10px" overflow="hidden">
-          <Thead bg="gray.100" height="60px">
-            <Tr>
-              <Th color="gray.400">#</Th>
-              <Th color="gray.400">Order Number</Th>
-              <Th color="gray.400">Material Category</Th>
-              <Th color="gray.400">Vendor</Th>
-              <Th color="gray.400">Invitee</Th>
-              <Th color="gray.400">Host/Inviter Contact Information</Th>
-              <Th color="gray.400">Sender</Th>
-              <Th color="gray.400">Status</Th>
-              <Th color="gray.400">Supplement Template</Th>
-              <Th color="gray.400">Action</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {tableData.map((row) => (
-              <Tr key={row.id}>
-                <Td>{row.id}</Td>
-                <Td>{row.orderNumber}</Td>
-                <Td>{row.category}</Td>
-                <Td>{row.vendor}</Td>
-                <Td>{row.invitee}</Td>
-                <Td>{row.contact}</Td>
-                <Td>{row.sender}</Td>
-                <Td>{row.status}</Td>
-                <Td>{row.template}</Td>
-                <Td>
-                  <Tooltip label="Edit">
-                    <IconButton
-                      variant="outline"
-                      aria-label="Edit"
-                      icon={<PencilIcon />}
-                      size="xs"
-                      onClick={() => handleEditRow(row)}
-                    />
-                  </Tooltip>
-                </Td>
+        {/* Wrapping Table inside Box to enable horizontal scrolling */}
+        <Box overflowX="auto">
+          <Table variant="simple" borderRadius="10px" overflow="hidden">
+            <Thead bg="gray.100" height="60px">
+              <Tr>
+                <Th color="gray.400">#</Th>
+                <Th color="gray.400">Order Number</Th>
+                <Th color="gray.400">Material Category</Th>
+                <Th color="gray.400">Vendor</Th>
+                <Th color="gray.400">Invitee</Th>
+                <Th color="gray.400">Host/Inviter Contact Information</Th>
+                <Th color="gray.400">Sender</Th>
+                <Th color="gray.400">Status</Th>
+                <Th color="gray.400">Supplement Template</Th>
+                <Th color="gray.400">Action</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
+            </Thead>
+            <Tbody>
+              {filteredData.map((row) => (
+                <Tr key={row.id}>
+                  <Td>{row.id}</Td>
+                  <Td>{row.orderNumber}</Td>
+                  <Td>{row.materialCategory}</Td>
+                  <Td>{row.vendor}</Td>
+                  <Td>{row.invitee}</Td>
+                  <Td>{row.hostInviterContactInfo}</Td>
+                  <Td>{row.sender}</Td>
+                  <Td>{row.status}</Td>
+                  <Td>{row.supplementTemplate}</Td>
+                  <Td>
+                    <Tooltip label="Edit">
+                      <IconButton
+                        variant="outline"
+                        aria-label="Edit"
+                        icon={<PencilIcon />}
+                        size="xs"
+                        onClick={() => handleEditRow(row.id)}
+                      />
+                    </Tooltip>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
 
         <Flex justify="space-between" align="center" mt={4}>
           <Text fontSize="sm">Page {currentPage} of 1</Text>
@@ -251,81 +321,69 @@ const CustomerDeliveryNotice = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Row</ModalHeader>
+          <ModalHeader>{selectedRowId ? "Edit Row" : "Add New Row"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl>
+            <FormControl width="100%" mt={4}>
               <FormLabel>Order Number</FormLabel>
               <Input
-                name="orderNumber"
-                value={currentRow?.orderNumber || ""}
-                onChange={(e) => setCurrentRow({ ...currentRow, orderNumber: e.target.value })}
+                value={newRow.orderNumber}
+                onChange={(e) => setNewRow({ ...newRow, orderNumber: e.target.value })}
               />
             </FormControl>
-            <FormControl mt={4}>
+            <FormControl width="100%" mt={4}>
               <FormLabel>Material Category</FormLabel>
               <Input
-                name="category"
-                value={currentRow?.category || ""}
-                onChange={(e) => setCurrentRow({ ...currentRow, category: e.target.value })}
+                value={newRow.materialCategory}
+                onChange={(e) => setNewRow({ ...newRow, materialCategory: e.target.value })}
               />
             </FormControl>
-            <FormControl mt={4}>
+            <FormControl width="100%" mt={4}>
               <FormLabel>Vendor</FormLabel>
               <Input
-                name="vendor"
-                value={currentRow?.vendor || ""}
-                onChange={(e) => setCurrentRow({ ...currentRow, vendor: e.target.value })}
+                value={newRow.vendor}
+                onChange={(e) => setNewRow({ ...newRow, vendor: e.target.value })}
               />
             </FormControl>
-            <FormControl mt={4}>
+            <FormControl width="100%" mt={4}>
               <FormLabel>Invitee</FormLabel>
               <Input
-                name="invitee"
-                value={currentRow?.invitee || ""}
-                onChange={(e) => setCurrentRow({ ...currentRow, invitee: e.target.value })}
+                value={newRow.invitee}
+                onChange={(e) => setNewRow({ ...newRow, invitee: e.target.value })}
               />
             </FormControl>
-            <FormControl mt={4}>
-              <FormLabel>Host/Inviter Contact</FormLabel>
+            <FormControl width="100%" mt={4}>
+              <FormLabel>Host/Inviter Contact Information</FormLabel>
               <Input
-                name="contact"
-                value={currentRow?.contact || ""}
-                onChange={(e) => setCurrentRow({ ...currentRow, contact: e.target.value })}
+                value={newRow.hostInviterContactInfo}
+                onChange={(e) => setNewRow({ ...newRow, hostInviterContactInfo: e.target.value })}
               />
             </FormControl>
-            <FormControl mt={4}>
+            <FormControl width="100%" mt={4}>
               <FormLabel>Sender</FormLabel>
               <Input
-                name="sender"
-                value={currentRow?.sender || ""}
-                onChange={(e) => setCurrentRow({ ...currentRow, sender: e.target.value })}
+                value={newRow.sender}
+                onChange={(e) => setNewRow({ ...newRow, sender: e.target.value })}
               />
             </FormControl>
-            <FormControl mt={4}>
+            <FormControl width="100%" mt={4}>
               <FormLabel>Status</FormLabel>
-              <Select
-                name="status"
-                value={currentRow?.status || "Pending"}
-                onChange={(e) => setCurrentRow({ ...currentRow, status: e.target.value })}
-              >
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-              </Select>
+              <Input
+                value={newRow.status}
+                onChange={(e) => setNewRow({ ...newRow, status: e.target.value })}
+              />
             </FormControl>
-            <FormControl mt={4}>
+            <FormControl width="100%" mt={4}>
               <FormLabel>Supplement Template</FormLabel>
               <Input
-                type="text"
-                name="template"
-                value={currentRow?.template || ""}
-                onChange={(e) => setCurrentRow({ ...currentRow, template: e.target.value })}
+                value={newRow.supplementTemplate}
+                onChange={(e) => setNewRow({ ...newRow, supplementTemplate: e.target.value })}
               />
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={handleSaveRow}>
-              Save
+              {selectedRowId ? "Update" : "Add"}
             </Button>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
           </ModalFooter>

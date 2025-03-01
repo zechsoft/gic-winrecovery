@@ -9,6 +9,7 @@ export default function Pages(props) {
   const { ...rest } = props;
   // ref for the wrapper div
   const wrapper = React.createRef();
+
   React.useEffect(() => {
     document.body.style.overflow = "unset";
     // Specify how to clean up after this effect:
@@ -39,6 +40,9 @@ export default function Pages(props) {
     return activeRoute;
   };
 
+  // Filter out sign in and sign up options for the sidebar
+  const filteredRoutes = filterAuthRoutes(routes);
+
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.collapse) {
@@ -60,6 +64,16 @@ export default function Pages(props) {
       }
     });
   };
+
+  // Helper function to filter out sign in and sign up from sidebar
+  function filterAuthRoutes(routes) {
+    // We don't modify routes directly to avoid affecting other components
+    // This function is only used for sidebar rendering
+    return routes.filter(route => {
+      // Filter out Sign In and Sign Up routes that have layout="/auth"
+      return !(route.layout === "/auth" && (route.path === "/signin" || route.path === "/signup"));
+    });
+  }
 
   const navRef = React.useRef();
   document.documentElement.dir = "ltr";

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -46,41 +46,42 @@ const CustomerOrder = () => {
       customerNumber: "123",
       customer: "John Doe",
       buyer: "Jane Doe",
-      platformNo: "Platform 1",
-      poNo: "PO12345",
+      platformNo: "P123",
+      poNo: "PO123",
       purchaseDate: "2023-04-18",
-      orderAmount: "$5000",
+      orderAmount: "1000",
       currency: "USD",
-      purchasingDepartment: "Electronics",
-      purchaser: "Mark Smith",
-      requisitionBusinessGroup: "Retail",
-      deliveryStatus: "Delivered",
-      orderStatus: "Completed",
+      purchasingDepartment: "Dept A",
+      purchaser: "Alice",
+      requisitionBusinessGroup: "Group 1",
+      deliveryStatus: "Shipped",
+      orderStatus: "Pending",
       acceptanceStatus: "Accepted",
-      statementStatus: "Pending",
+      statementStatus: "Generated",
     },
     {
       id: 2,
       customerNumber: "124",
       customer: "Alice Smith",
       buyer: "Bob Brown",
-      platformNo: "Platform 2",
-      poNo: "PO12346",
+      platformNo: "P124",
+      poNo: "PO124",
       purchaseDate: "2023-04-19",
-      orderAmount: "$7000",
+      orderAmount: "2000",
       currency: "EUR",
-      purchasingDepartment: "Furniture",
-      purchaser: "Lucy Green",
-      requisitionBusinessGroup: "Wholesale",
-      deliveryStatus: "Shipped",
-      orderStatus: "Processing",
-      acceptanceStatus: "Pending",
-      statementStatus: "Completed",
+      purchasingDepartment: "Dept B",
+      purchaser: "Bob",
+      requisitionBusinessGroup: "Group 2",
+      deliveryStatus: "Delivered",
+      orderStatus: "Completed",
+      acceptanceStatus: "Rejected",
+      statementStatus: "Pending",
     },
   ]);
 
+  const [filteredData, setFilteredData] = useState(tableData); // New state for filtered data
   const [searchTerm, setSearchTerm] = useState("");
-  const [country, setCountry] = useState("USA");
+  const [country, setCountry] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRow, setNewRow] = useState({
@@ -100,8 +101,7 @@ const CustomerOrder = () => {
     acceptanceStatus: "",
     statementStatus: "",
   });
-
-  const [editingRow, setEditingRow] = useState(null);  // Track the row being edited
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
   const searchInputRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -114,21 +114,31 @@ const CustomerOrder = () => {
 
   const handleAddRow = () => {
     setIsModalOpen(true);
+    setSelectedRowId(null);
+  };
+
+  const handleEditRow = (rowId) => {
+    const selectedRow = tableData.find((row) => row.id === rowId);
+    if (selectedRow) {
+      setNewRow(selectedRow);
+      setSelectedRowId(rowId);
+      setIsModalOpen(true);
+    }
   };
 
   const handleSaveRow = () => {
-    if (editingRow) {
-      // Edit existing row
+    if (selectedRowId) {
       const updatedTableData = tableData.map((row) =>
-        row.id === editingRow.id ? { ...editingRow, ...newRow } : row
+        row.id === selectedRowId ? { ...row, ...newRow } : row
       );
       setTableData(updatedTableData);
+      setFilteredData(updatedTableData); // Update filteredData as well
+      setSelectedRowId(null);
     } else {
-      // Add new row
       const updatedRow = { ...newRow, id: tableData.length + 1 };
       setTableData([...tableData, updatedRow]);
+      setFilteredData([...filteredData, updatedRow]); // Update filteredData as well
     }
-
     setIsModalOpen(false);
     setNewRow({
       customerNumber: "",
@@ -147,28 +157,87 @@ const CustomerOrder = () => {
       acceptanceStatus: "",
       statementStatus: "",
     });
-    setEditingRow(null);  // Clear editing state
   };
 
   const navigate = useHistory();
   const handleViewAllClick = () => navigate.push("/admin/tables");
-  const handleSearch = () => alert("Search functionality not implemented yet");
-  const handleClear = () => setSearchTerm("");
 
-  // Function to open modal for editing a row
-  const handleEditRow = (row) => {
-    setEditingRow(row);
-    setNewRow(row);  // Populate form fields with row data
-    setIsModalOpen(true);
+  const handleSearch = () => {
+    if (country === "All") {
+      // Search in all columns
+      const filteredData = tableData.filter((row) =>
+        row.customerNumber.includes(searchTerm) ||
+        row.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.buyer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.platformNo.includes(searchTerm) ||
+        row.poNo.includes(searchTerm) ||
+        row.purchaseDate.includes(searchTerm) ||
+        row.orderAmount.includes(searchTerm) ||
+        row.currency.includes(searchTerm) ||
+        row.purchasingDepartment.includes(searchTerm) ||
+        row.purchaser.includes(searchTerm) ||
+        row.requisitionBusinessGroup.includes(searchTerm) ||
+        row.deliveryStatus.includes(searchTerm) ||
+        row.orderStatus.includes(searchTerm) ||
+        row.acceptanceStatus.includes(searchTerm) ||
+        row.statementStatus.includes(searchTerm)
+      );
+      setFilteredData(filteredData);
+    } else {
+      // Search in specific column
+      const filteredData = tableData.filter((row) => {
+        switch (country) {
+          case "Customer Number":
+            return row.customerNumber.includes(searchTerm);
+          case "Customer":
+            return row.customer.toLowerCase().includes(searchTerm.toLowerCase());
+          case "Buyer":
+            return row.buyer.toLowerCase().includes(searchTerm.toLowerCase());
+          case "Platform No":
+            return row.platformNo.includes(searchTerm);
+          case "PO No":
+            return row.poNo.includes(searchTerm);
+          case "Purchase Date":
+            return row.purchaseDate.includes(searchTerm);
+          case "Order Amount":
+            return row.orderAmount.includes(searchTerm);
+          case "Currency":
+            return row.currency.includes(searchTerm);
+          case "Purchasing Department":
+            return row.purchasingDepartment.includes(searchTerm);
+          case "Purchaser":
+            return row.purchaser.includes(searchTerm);
+          case "Requisition Business Group":
+            return row.requisitionBusinessGroup.includes(searchTerm);
+          case "Delivery Status":
+            return row.deliveryStatus.includes(searchTerm);
+          case "Order Status":
+            return row.orderStatus.includes(searchTerm);
+          case "Acceptance Status":
+            return row.acceptanceStatus.includes(searchTerm);
+          case "Statement Status":
+            return row.statementStatus.includes(searchTerm);
+          default:
+            return true;
+        }
+      });
+      setFilteredData(filteredData);
+    }
+  };
+
+  const handleClear = () => {
+    setSearchTerm("");
+    setCountry("All");
+    setFilteredData(tableData); // Reset to original data
   };
 
   return (
     <Box mt={16}>
-      <Flex direction="column" bg="white" p={6} boxShadow="md" borderRadius="15px" maxWidth="1200px" mx="auto">
+      <Flex direction="column" bg="white" p={6} boxShadow="md" borderRadius="15px" width="100%">
         <Flex justify="space-between" mb={8}>
           <Flex direction="column">
-            <Text fontSize="xl" fontWeight="bold">Customer Order Information</Text>
-            <Text fontSize="md" color="gray.400">Manage Customer Order Information</Text>
+            <Text fontSize="xl" fontWeight="bold">Customer Orders</Text>
+            <Text fontSize="md" color="gray.400">Manage Customer Orders</Text>
           </Flex>
           <Flex direction="row" gap={2}>
             <Button size="sm" onClick={handleViewAllClick} mr={2}>View All</Button>
@@ -187,18 +256,29 @@ const CustomerOrder = () => {
             </TabList>
           </Tabs>
           <Flex>
-            <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="Select" width={40} mr={4}>
-              <option value="USA">All</option>
-              <option value="Germany">Germany</option>
-              <option value="Italy">Italy</option>
-              <option value="China">China</option>
+            <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="" width={40} mr={4}>
+              <option value="All">All</option>
+              <option value="Customer Number">Customer Number</option>
+              <option value="Customer">Customer</option>
+              <option value="Buyer">Buyer</option>
+              <option value="Platform No">Platform No</option>
+              <option value="PO No">PO No</option>
+              <option value="Purchase Date">Purchase Date</option>
+              <option value="Order Amount">Order Amount</option>
+              <option value="Currency">Currency</option>
+              <option value="Purchasing Department">Purchasing Department</option>
+              <option value="Purchaser">Purchaser</option>
+              <option value="Requisition Business Group">Requisition Business Group</option>
+              <option value="Delivery Status">Delivery Status</option>
+              <option value="Order Status">Order Status</option>
+              <option value="Acceptance Status">Acceptance Status</option>
+              <option value="Statement Status">Statement Status</option>
             </Select>
             <FormControl width="half" mr={4}>
               <FormLabel
                 position="absolute"
                 top={isFocused || searchTerm ? "-16px" : "12px"}
                 left="40px"
-                top="9px"
                 color="gray.500"
                 fontSize={isFocused || searchTerm ? "xs" : "sm"}
                 transition="all 0.2s ease"
@@ -255,7 +335,7 @@ const CustomerOrder = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {tableData.map((row) => (
+              {filteredData.map((row) => (
                 <Tr key={row.id}>
                   <Td>{row.customerNumber}</Td>
                   <Td>{row.customer}</Td>
@@ -279,7 +359,7 @@ const CustomerOrder = () => {
                         aria-label="Edit"
                         icon={<PencilIcon />}
                         size="xs"
-                        onClick={() => handleEditRow(row)} // Handle editing the row
+                        onClick={() => handleEditRow(row.id)}
                       />
                     </Tooltip>
                   </Td>
@@ -301,7 +381,7 @@ const CustomerOrder = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{editingRow ? "Edit Row" : "Add New Row"}</ModalHeader>
+          <ModalHeader>{selectedRowId ? "Edit Row" : "Add New Row"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl width="100%" mt={4}>
@@ -413,7 +493,7 @@ const CustomerOrder = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={handleSaveRow}>
-              {editingRow ? "Save Changes" : "Add"}
+              {selectedRowId ? "Update" : "Add"}
             </Button>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
           </ModalFooter>

@@ -49,12 +49,27 @@ function Sidebar(props) {
     const sidebarActiveShadow = "0px 7px 11px rgba(0, 0, 0, 0.04)";
 
     return routes.map((prop, key) => {
-      if (prop.redirect) {
+      // Skip routes that should not be shown in sidebar
+      if (prop.redirect || prop.sidebar === false) {
         return null;
       }
 
       if (prop.category) {
         const isOpen = state[prop.state]; // Check if the category is open
+        
+        // Skip category if it should not be shown in sidebar
+        if (prop.sidebar === false) {
+          return null;
+        }
+        
+        // Filter views that should appear in sidebar
+        const sidebarViews = prop.views.filter(view => view.sidebar !== false);
+        
+        // If no views to show, skip this category
+        if (sidebarViews.length === 0) {
+          return null;
+        }
+        
         return (
           <Box key={key}>
             <Flex
@@ -73,7 +88,7 @@ function Sidebar(props) {
                   : prop.name}
               </Text>
             </Flex>
-            {isOpen && createLinks(prop.views)} {/* Render sub-items if open */}
+            {isOpen && createLinks(sidebarViews)} {/* Render sub-items if open */}
           </Box>
         );
       }
@@ -139,7 +154,9 @@ function Sidebar(props) {
     });
   };
 
-  var links = <>{createLinks(routes)}</>;
+  // Filter routes that should appear in sidebar
+  const sidebarRoutes = routes.filter(route => route.sidebar !== false);
+  var links = <>{createLinks(sidebarRoutes)}</>;
 
   let sidebarBg = useColorModeValue("white", "navy.800");
   let sidebarRadius = "20px";
@@ -225,7 +242,8 @@ export function SidebarResponsive(props) {
     const sidebarActiveShadow = "0px 7px 11px rgba(0, 0, 0, 0.04)";
 
     return routes.map((prop, key) => {
-      if (prop.redirect) {
+      // Skip routes that should not be shown in sidebar
+      if (prop.redirect || prop.sidebar === false) {
         return null;
       }
 
@@ -280,7 +298,9 @@ export function SidebarResponsive(props) {
     });
   };
 
-  var links = <>{createLinks(routes)}</>;
+  // Filter routes that should appear in sidebar for responsive view
+  const sidebarRoutes = routes.filter(route => route.sidebar !== false);
+  var links = <>{createLinks(sidebarRoutes)}</>;
 
   return (
     <Box display={{ sm: "block", xl: "none" }}>

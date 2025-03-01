@@ -7,27 +7,74 @@ import ClientLayout from "layouts/Client.js";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "theme/theme.js";
 
-// Simulate user role (e.g., this could come from context or API)
-const userRole = "admin"; // Change this to "client" to test for client role
+// Authentication check function
+const checkUserAuth = () => {
+  // Check sessionStorage first (for session-only login)
+  const sessionUser = sessionStorage.getItem("user");
+  if (sessionUser) {
+    return JSON.parse(sessionUser);
+  }
+  
+  // Check localStorage (for remember me)
+  const localUser = localStorage.getItem("user");
+  if (localUser) {
+    return JSON.parse(localUser);
+  }
+  
+  // No authenticated user found
+  return null;
+};
 
-ReactDOM.render(
-  <ChakraProvider theme={theme} resetCss={false} position="relative">
-    <HashRouter>
-      <Switch>
-        <Route path={`/auth`} component={AuthLayout} />
-        {/* Conditional routing based on user role */}
-        {userRole === "admin" ? (
-          <Route path={`/admin`} component={AdminLayout} />
-        ) : (
-          <Route path={`/client`} component={ClientLayout} />
-        )}
-        {/* Redirect to the appropriate dashboard based on user role */}
-        <Redirect
-          from={`/`}
-          to={userRole === "admin" ? "/admin/dashboard" : "/client/dashboard"}
-        />
-      </Switch>
-    </HashRouter>
-  </ChakraProvider>,
-  document.getElementById("root")
-);
+// Protected Route component
+const ProtectedRoute = ({ component: Component, allowedRole, ...rest }) => {
+  const user = checkUserAuth();
+  
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        // If user is authenticated and has correct role
+        if (user && user.isAuthenticated && user.role === allowedRole) {
+          return <Component {...props} />;
+        }
+        
+        // If user is authenticated but wrong role
+        if (user && user.isAuthenticated) {
+          return <Redirect to={`/${user.role}/dashboard`} />;
+        }
+        
+        // Not authenticated, redirect to login
+        return <Redirect to="/auth/signin" />;
+      }}
+    />
+  );
+};
+
+const App = () => {
+  const user = checkUserAuth();
+  
+  return (
+    <ChakraProvider theme={theme} resetCss={false} position="relative">
+      <HashRouter>
+        <Switch>
+          {/* Auth routes are public */}
+          <Route path="/auth" component={AuthLayout} />
+          
+          {/* Protected routes */}
+          <ProtectedRoute path="/admin" component={AdminLayout} allowedRole="admin" />
+          <ProtectedRoute path="/client" component={ClientLayout} allowedRole="client" />
+          
+          {/* Default redirect */}
+          {user && user.isAuthenticated ? (
+            <Redirect from="/" to={`/${user.role}/dashboard`} />
+          ) : (
+            <Redirect from="/" to="/auth/signin" />
+          )}
+        </Switch>
+      </HashRouter>
+    </ChakraProvider>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+

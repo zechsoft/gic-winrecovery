@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Dashboard from "views/Dashboard/Dashboard.js";
 import Tables from "views/Dashboard/Tables.js";
 import SupplierInfo from "views/Dashboard/SupplierInfo.js";
-
+import Messages from 'views/Dashboard/Messages';
 import CustomerOrder from "views/Dashboard/CustomerOrder.js";
 import Profile from "views/Dashboard/Profile.js";
 import SignIn from "views/Pages/SignIn.js";
@@ -30,6 +30,7 @@ var dashRoutes = [
     icon: <HomeIcon color='inherit' />,
     component: Dashboard,
     layout: "/admin",
+    sidebar: true,
   },
   {
     path: "/profile",
@@ -39,6 +40,16 @@ var dashRoutes = [
     secondaryNavbar: true,
     component: Profile,
     layout: "/admin",
+    sidebar: true,
+  },
+  {
+    path: "/message",
+    name: "Message",
+    rtlName: "لوحة القيادة",
+    icon: <StatsIcon color='inherit' />,
+    component: Messages,
+    layout: "/admin",
+    sidebar: true,
   },
   
   {
@@ -55,6 +66,7 @@ var dashRoutes = [
         secondaryNavbar: true,
         component: SupplierInfo,
         layout: "/admin",
+        sidebar: true,
       },
       {
         path: "/customer-order",
@@ -64,6 +76,7 @@ var dashRoutes = [
         secondaryNavbar: true,
         component: CustomerOrder,
         layout: "/admin",
+        sidebar: true,
       },
       {
         path: "/material-inquiry",
@@ -73,6 +86,7 @@ var dashRoutes = [
         secondaryNavbar: true,
         component: MaterialInquiry,
         layout: "/admin",
+        sidebar: true,
       },
       {
         path: "/material-replenishment",
@@ -82,6 +96,7 @@ var dashRoutes = [
         secondaryNavbar: true,
         component: MaterialReplenishment,
         layout: "/admin",
+        sidebar: true,
       },
       {
         path: "/customer-delivery-notice",
@@ -91,6 +106,7 @@ var dashRoutes = [
         secondaryNavbar: true,
         component: CustomerDeliveryNotice,
         layout: "/admin",
+        sidebar: true,
       },
     ],
   },
@@ -102,6 +118,7 @@ var dashRoutes = [
     component: DailyWorkReport,
     state: "pageCollapse",
     layout: "/admin",
+    sidebar: true,
   },
   {
     path: "/tables",
@@ -111,6 +128,7 @@ var dashRoutes = [
     component: Tables,
     state: "pageCollapse",
     layout: "/admin",
+    sidebar: true,
   },
   {
     path: "/signin",
@@ -119,6 +137,7 @@ var dashRoutes = [
     icon: <DocumentIcon color='inherit' />,
     component: SignIn,
     layout: "/auth",
+    sidebar: false,
   },
   {
     path: "/signup",
@@ -127,6 +146,7 @@ var dashRoutes = [
     icon: <DocumentIcon color='inherit' />,
     component: SignUp,
     layout: "/auth",
+    sidebar: false,
   },
 ];
 

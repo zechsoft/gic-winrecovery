@@ -1,36 +1,11 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  IconButton,
-  Tooltip,
-  Input,
-  Select,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  ModalFooter,
-  useDisclosure,
-  Flex,
-  Text,
-  InputGroup,
-  InputLeftElement,
-  Tabs,
-  TabList,
-  Tab,
-} from "@chakra-ui/react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import { useHistory } from "react-router-dom";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { UserPlusIcon } from "@heroicons/react/24/solid";
+import SearchFilter from "./SearchFilter";
+import DataTable from "./DataTable";
+import EditModal from "./EditModal";
+import Pagination from "./Pagination";
+import TabsComponent from "./Tabs";
 
 const TABS = [
   { label: "All", value: "all" },
@@ -39,31 +14,48 @@ const TABS = [
 ];
 
 const DailyWorkReport = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure(); // Corrected import here
   const [tableData, setTableData] = useState([
     {
       id: 1,
+      companyName: "ABC Corp",
+      projectName: "Project X",
+      supervisorName: "John Doe",
+      managerName: "Jane Smith",
+      prepaidBy: "Client A",
       employees: 5,
       workType: "Construction",
       progress: "50",
       hours: 8,
-      charges: "500",
-      date: "23/04/18",
+      charges: "400",
+      date: "2023-04-18",
     },
     {
       id: 2,
+      companyName: "XYZ Inc",
+      projectName: "Project Y",
+      supervisorName: "Alice Johnson",
+      managerName: "Bob Lee",
+      prepaidBy: "Client B",
       employees: 3,
       workType: "Maintenance",
       progress: "75",
       hours: 6,
       charges: "300",
-      date: "23/04/19",
+      date: "2023-04-19",
     },
   ]);
 
+  const [filteredData, setFilteredData] = useState(tableData);
   const [searchTerm, setSearchTerm] = useState("");
-  const [country, setCountry] = useState("USA");
+  const [country, setCountry] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRow, setNewRow] = useState({
+    companyName: "",
+    projectName: "",
+    supervisorName: "",
+    managerName: "",
+    prepaidBy: "",
     employees: "",
     workType: "",
     progress: "",
@@ -71,126 +63,121 @@ const DailyWorkReport = () => {
     charges: "",
     date: "",
   });
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
-  const handleInputChange = (e) => {
-    setNewRow({ ...newRow, [e.target.name]: e.target.value });
-  };
-
-  const handleAddRow = () => {
-    if (!newRow.employees || !newRow.workType || !newRow.date) return;
-    
-    if (editingIndex !== null) {
-      // Edit existing row
-      const updatedTableData = [...tableData];
-      updatedTableData[editingIndex] = { id: tableData[editingIndex].id, ...newRow };
-      setTableData(updatedTableData);
-      setEditingIndex(null);
+  const handleSearch = () => {
+    if (country === "All") {
+      const filteredData = tableData.filter((row) =>
+        row.employees.toString().includes(searchTerm) ||
+        row.workType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.progress.toString().includes(searchTerm)
+      );
+      setFilteredData(filteredData);
     } else {
-      // Add new row
-      setTableData([...tableData, { id: tableData.length + 1, ...newRow }]);
+      const filteredData = tableData.filter((row) => {
+        switch (country) {
+          case "No. of Employees":
+            return row.employees.toString().includes(searchTerm);
+          case "Nature of Work":
+            return row.workType.toLowerCase().includes(searchTerm.toLowerCase());
+          case "Progress":
+            return row.progress.toString().includes(searchTerm);
+          default:
+            return true;
+        }
+      });
+      setFilteredData(filteredData);
     }
-
-    setNewRow({ employees: "", workType: "", progress: "", hours: "", charges: "", date: "" });
-    onClose();
   };
 
-  const handleEditRow = (index) => {
-    setEditingIndex(index);
-    setNewRow(tableData[index]);
-    onOpen();
+  const handleClear = () => {
+    setSearchTerm("");
+    setCountry("All");
+    setFilteredData(tableData);
   };
 
-  const navigate = useHistory();
-  const handleViewAllClick = () => navigate.push("/admin/tables");
+  const handleAddRow = () => setIsModalOpen(true);
+
+  const handleEditRow = (rowId) => {
+    const selectedRow = tableData.find((row) => row.id === rowId);
+    if (selectedRow) {
+      setNewRow(selectedRow);
+      setSelectedRowId(rowId);
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleSaveRow = () => {
+    if (selectedRowId) {
+      const updatedTableData = tableData.map((row) =>
+        row.id === selectedRowId ? { ...row, ...newRow } : row
+      );
+      setTableData(updatedTableData);
+      setFilteredData(updatedTableData);
+      setSelectedRowId(null);
+    } else {
+      const updatedRow = { ...newRow, id: tableData.length + 1 };
+      setTableData([...tableData, updatedRow]);
+      setFilteredData([...filteredData, updatedRow]);
+    }
+    setIsModalOpen(false);
+    setNewRow({
+      companyName: "",
+      projectName: "",
+      supervisorName: "",
+      managerName: "",
+      prepaidBy: "",
+      employees: "",
+      workType: "",
+      progress: "",
+      hours: "",
+      charges: "",
+      date: "",
+    });
+  };
+
+  const columns = ["Company Name", "Project Name", "Supervisor Name", "Manager Name", "Prepaid By", "No. of Employee", "Nature of Work", "Progress (%)", "Hour of Work", "Charges", "Date"];
 
   return (
-    <Box mt={16} p={6} bg="white" boxShadow="md" borderRadius="15px" maxWidth="1200px" mx="auto">
-      <Flex justify="space-between" mb={4}>
-        <Text fontSize="xl" fontWeight="bold">Daily Work Report</Text>
-        <Button size="sm" colorScheme="blue" leftIcon={<UserPlusIcon />} onClick={() => { setEditingIndex(null); onOpen(); }}>
-          Add New Row
-        </Button>
-      </Flex>
-      
-      <Flex justify="space-between" align="center" mb={4}>
-        <Tabs defaultIndex={0} isLazy>
-          <TabList>
-            {TABS.map(({ label, value }) => (
-              <Tab key={value} value={value}>{label}</Tab>
-            ))}
-          </TabList>
-        </Tabs>
-        <Flex>
-          <Select value={country} onChange={e => setCountry(e.target.value)} placeholder="Select" width={40} mr={2}>
-            <option value="USA">All</option>
-            <option value="Germany">Germany</option>
-            <option value="Italy">Italy</option>
-            <option value="China">China</option>
-          </Select>
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              <MagnifyingGlassIcon style={{ height: "30px", width: "20px", padding: "2.5px" }} />
-            </InputLeftElement>
-            <Input placeholder="Search here" size="md" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-          </InputGroup>
-        </Flex>
-      </Flex>
-      
-      <Table variant="simple">
-        <Thead bg="gray.100">
-          <Tr>
-            <Th>SR.NO</Th>
-            <Th>No. of Employee</Th>
-            <Th>Nature of Work</Th>
-            <Th>Progress (%)</Th>
-            <Th>Hour of Work</Th>
-            <Th>Charges</Th>
-            <Th>Date</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {tableData.map((row, index) => (
-            <Tr key={row.id}>
-              <Td>{row.id}</Td>
-              <Td>{row.employees}</Td>
-              <Td>{row.workType}</Td>
-              <Td>{row.progress}</Td>
-              <Td>{row.hours}</Td>
-              <Td>{row.charges}</Td>
-              <Td>{row.date}</Td>
-              <Td>
-                <Tooltip label="Edit">
-                  <IconButton variant="outline" aria-label="Edit" icon={<PencilIcon />} size="sm" onClick={() => handleEditRow(index)} />
-                </Tooltip>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-      
-      {/* Modal for Adding/Editing Row */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{editingIndex !== null ? "Edit Work Report" : "Add New Work Report"}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Input placeholder="No. of Employee" name="employees" value={newRow.employees} onChange={handleInputChange} mb={2} />
-            <Input placeholder="Nature of Work" name="workType" value={newRow.workType} onChange={handleInputChange} mb={2} />
-            <Input placeholder="Progress (%)" name="progress" value={newRow.progress} onChange={handleInputChange} mb={2} />
-            <Input placeholder="Hour of Work" name="hours" value={newRow.hours} onChange={handleInputChange} mb={2} />
-            <Input placeholder="Charges ($)" name="charges" value={newRow.charges} onChange={handleInputChange} mb={2} />
-            <Input type="date" name="date" value={newRow.date} onChange={handleInputChange} mb={2} />
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleAddRow}>
-              {editingIndex !== null ? "Update" : "Add"}
+    <Box mt={16}>
+      <Flex direction="column" bg="white" p={6} boxShadow="md" borderRadius="15px" width="100%">
+        <Flex justify="space-between" mb={8}>
+          <Flex direction="column">
+            <Text fontSize="xl" fontWeight="bold">Daily Work Report</Text>
+            <Text fontSize="md" color="gray.400">See information about daily work reports</Text>
+          </Flex>
+          <Flex direction="row" gap={2}>
+            <Button size="sm" onClick={handleViewAllClick} mr={2}>View All</Button>
+            <Button size="sm" colorScheme="blue" leftIcon={<UserPlusIcon />} onClick={handleAddRow}>
+              Add Row
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </Flex>
+        </Flex>
+
+        <Flex justify="space-between" align="center" mb={4}>
+          <TabsComponent tabs={TABS} />
+          <SearchFilter
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            country={country}
+            setCountry={setCountry}
+            handleSearch={handleSearch}
+            handleClear={handleClear}
+          />
+        </Flex>
+
+        <DataTable columns={columns} data={filteredData} handleEditRow={handleEditRow} />
+        <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      </Flex>
+
+      <EditModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        newRow={newRow}
+        setNewRow={setNewRow}
+        handleSaveRow={handleSaveRow}
+        selectedRowId={selectedRowId}
+      />
     </Box>
   );
 };
