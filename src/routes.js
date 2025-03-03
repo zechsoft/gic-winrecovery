@@ -5,6 +5,7 @@ import SupplierInfo from "views/Dashboard/SupplierInfo.js";
 import Messages from 'views/Dashboard/Messages';
 import CustomerOrder from "views/Dashboard/CustomerOrder.js";
 import Profile from "views/Dashboard/Profile.js";
+import ForgotPassword from "views/Pages/ForgotPassword.js";
 import SignIn from "views/Pages/SignIn.js";
 import SignUp from "views/Pages/SignUp.js"; // Import Sign Up component
 import MaterialReplenishment from "views/Dashboard/MaterialReplenishment.js"; 
@@ -37,7 +38,7 @@ var dashRoutes = [
     name: "Profile",
     rtlName: "لوحة القيادة",
     icon: <PersonIcon color='inherit' />,
-    secondaryNavbar: true,
+   
     component: Profile,
     layout: "/admin",
     sidebar: true,
@@ -51,19 +52,28 @@ var dashRoutes = [
     layout: "/admin",
     sidebar: true,
   },
+  {
+    path: "/forgot-password",
+    name: "Forgot Password",
+    icon: <DocumentIcon color='inherit' />,
+    component: ForgotPassword,
+    layout: "/auth",
+    sidebar: false, // Hide from sidebar
+  },
   
   {
     name: "Tables",
     category: "account",
     rtlName: "صفحات",
     state: "pageCollapse",
+    hasSecondaryNavbar: true,
     views: [
       {
         path: "/supplier-info",
         name: "Supplier Info",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+       
         component: SupplierInfo,
         layout: "/admin",
         sidebar: true,
@@ -73,7 +83,7 @@ var dashRoutes = [
         name: "Customer Order",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+      
         component: CustomerOrder,
         layout: "/admin",
         sidebar: true,
@@ -83,7 +93,7 @@ var dashRoutes = [
         name: "Material Inquiry",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: MaterialInquiry,
         layout: "/admin",
         sidebar: true,
@@ -93,7 +103,7 @@ var dashRoutes = [
         name: "Material Replenish",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: MaterialReplenishment,
         layout: "/admin",
         sidebar: true,
@@ -103,7 +113,7 @@ var dashRoutes = [
         name: "Customer Delivery",
         rtlName: "لوحة القيادة",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: CustomerDeliveryNotice,
         layout: "/admin",
         sidebar: true,

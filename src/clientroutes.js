@@ -85,7 +85,7 @@ var clientRoutes = [
   },
   {
     path: "/forgot-password",
-    name: "Sign In",
+    name: "Forgot Password",
     icon: <DocumentIcon color='inherit' />,
     component: ForgotPassword,
     layout: "/auth",

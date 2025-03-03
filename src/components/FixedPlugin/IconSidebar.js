@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaHome, FaUser, FaTable, FaEnvelope, FaSignOutAlt, FaChevronLeft } from "react-icons/fa";
-import { useHistory } from "react-router-dom"; // Import useHistory hook
+import { useHistory } from "react-router-dom";
 import "./IconSidebar.css";
 
 const IconSidebar = ({ basePath = "/admin" }) => {
@@ -10,7 +10,7 @@ const IconSidebar = ({ basePath = "/admin" }) => {
   const toggleBtnRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  const history = useHistory(); // Hook to access history object for navigation
+  const history = useHistory();
 
   // Function to handle clicks outside
   useEffect(() => {
@@ -19,63 +19,44 @@ const IconSidebar = ({ basePath = "/admin" }) => {
         sidebarRef.current &&
         !sidebarRef.current.contains(event.target) &&
         toggleBtnRef.current &&
-        !toggleBtnRef.current.contains(event.target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
+        !toggleBtnRef.current.contains(event.target)
       ) {
         setIsOpen(false);
         setIsDropdownOpen(false);
       }
     };
-    if (isOpen || isDropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
 
+    // Add click event listener to close sidebar when clicking anywhere
+    document.addEventListener("mousedown", handleClickOutside);
+    
+    // Clean up the event listener on component unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, isDropdownOpen]);
+  }, []);
 
-  // Navigation Functions
-  const navigateToDashboard = () => {
-    history.push(`${basePath}/dashboard`);
+  // Listen for route changes to close sidebar
+  useEffect(() => {
+    const unlisten = history.listen(() => {
+      setIsOpen(false);
+      setIsDropdownOpen(false);
+    });
+    
+    // Clean up the listener when component unmounts
+    return unlisten;
+  }, [history]);
+
+  // Navigation handler function
+  const navigateTo = (path) => {
+    history.push(`${basePath}/${path}`);
     setIsOpen(false);
+    setIsDropdownOpen(false);
   };
 
-  const navigateToProfile = () => {
-    history.push(`${basePath}/profile`);
-    setIsOpen(false);
-  };
-
-  const navigateToSupplierInfo = () => {
-    history.push(`${basePath}/supplier-info`);
-    setIsOpen(false);
-  };
-
-  const navigateToCustomerOrder = () => {
-    history.push(`${basePath}/customer-order`);
-    setIsOpen(false);
-  };
-
-  const navigateToMaterialInquiry = () => {
-    history.push(`${basePath}/material-inquiry`);
-    setIsOpen(false);
-  };
-
-  const navigateToMaterialReplenishment = () => {
-    history.push(`${basePath}/material-replenishment`);
-    setIsOpen(false);
-  };
-
-  const navigateToCustomerDeliveryNotice = () => {
-    history.push(`${basePath}/customer-delivery-notice`);
-    setIsOpen(false);
-  };
-
-  // Function to handle redirect after navigation
-  const handleNavigationAndRedirect = (navigateFunction) => {
-    navigateFunction(); // First, navigate to the new route
-    setIsOpen(false); // Close the sidebar after navigation
+  // Toggle dropdown without navigating
+  const toggleDropdown = (e) => {
+    e.stopPropagation(); // Prevent this click from triggering the outside click handler
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
@@ -83,43 +64,48 @@ const IconSidebar = ({ basePath = "/admin" }) => {
       {/* Sidebar */}
       <div ref={sidebarRef} className={`icon-sidebar ${isOpen ? "open" : ""}`}>
         <div className="icon-sidebar-icons">
-          <button className="icon-sidebar-btn" onClick={() => handleNavigationAndRedirect(navigateToDashboard)}>
+          <button className="icon-sidebar-btn" onClick={() => navigateTo("dashboard")}>
             <FaHome title="Dashboard" />
           </button>
-          <button className="icon-sidebar-btn" onClick={() => handleNavigationAndRedirect(navigateToProfile)}>
+          
+          <button className="icon-sidebar-btn" onClick={() => navigateTo("profile")}>
             <FaUser title="Profile" />
           </button>
+          
           <div className="icon-sidebar-dropdown">
             <button
               className="icon-sidebar-btn"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={toggleDropdown}
             >
               <FaTable title="Table" />
             </button>
+            
             {isDropdownOpen && (
               <div ref={dropdownRef} className="dropdown-menu">
-                <button className="dropdown-item" onClick={() => handleNavigationAndRedirect(navigateToSupplierInfo)}>
+                <button className="dropdown-item" onClick={() => navigateTo("supplier-info")}>
                   Supplier Info
                 </button>
-                <button className="dropdown-item" onClick={() => handleNavigationAndRedirect(navigateToCustomerOrder)}>
+                <button className="dropdown-item" onClick={() => navigateTo("customer-order")}>
                   Customer Order
                 </button>
-                <button className="dropdown-item" onClick={() => handleNavigationAndRedirect(navigateToMaterialInquiry)}>
+                <button className="dropdown-item" onClick={() => navigateTo("material-inquiry")}>
                   Material Inquiry
                 </button>
-                <button className="dropdown-item" onClick={() => handleNavigationAndRedirect(navigateToMaterialReplenishment)}>
+                <button className="dropdown-item" onClick={() => navigateTo("material-replenishment")}>
                   Material Replenishment
                 </button>
-                <button className="dropdown-item" onClick={() => handleNavigationAndRedirect(navigateToCustomerDeliveryNotice)}>
+                <button className="dropdown-item" onClick={() => navigateTo("customer-delivery-notice")}>
                   Customer Delivery
                 </button>
               </div>
             )}
           </div>
-          <button className="icon-sidebar-btn">
+          
+          <button className="icon-sidebar-btn" onClick={() => navigateTo("messages")}>
             <FaEnvelope title="Message" />
           </button>
-          <button className="icon-sidebar-btn">
+          
+          <button className="icon-sidebar-btn" onClick={() => navigateTo("logout")}>
             <FaSignOutAlt title="Logout" />
           </button>
         </div>

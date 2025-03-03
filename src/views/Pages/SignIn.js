@@ -233,11 +233,12 @@ export default function SignIn() {
                 <Text ml="3" fontSize="sm" color={textColor}>Keep me logged In</Text>
               </Flex>
               <Link
-  href="/auth/forgot-password"
+  onClick={() => history.push("/auth/forgot-password")}
   fontSize="sm"
   fontWeight="medium"
   color={blueShade}
   _hover={{ textDecoration: "underline" }}
+  cursor="pointer"
 >
   Forgot Password?
 </Link>
@@ -278,9 +279,9 @@ export default function SignIn() {
             bgImage={`url(${signInImage})`}
             bgSize="cover"
             bgPosition="center"
-            borderTopRightRadius="20px"
-            borderBottomRightRadius="40px"
-            borderBottomLeftRadius="250px"
+            borderTopRightRadius="0px"
+            borderBottomRightRadius="0px"
+            borderBottomLeftRadius="0px"
             display={{ base: "none", md: "block" }}
           />
         </Flex>
