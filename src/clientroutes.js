@@ -5,6 +5,7 @@ import CustomerOrder from "views/Dashboard/CustomerOrder.js";
 import Profile from "views/Dashboard/Profile.js";
 import Messages from 'views/Dashboard/Messages';
 import SignIn from "views/Pages/SignIn.js";
+import ForgotPassword from "views/Pages/ForgotPassword.js";
 import SignUp from "views/Pages/SignUp.js";
 import MaterialReplenishment from "views/Dashboard/MaterialReplenishment.js"; 
 import MaterialInquiry from "views/Dashboard/MaterialInquiry.js";
@@ -79,8 +80,16 @@ var clientRoutes = [
     rtlName: "لوحة القيادة",
     icon: <StatsIcon color='inherit' />,
     component: Messages,
-    layout: "/admin",
+    layout: "/client",
     sidebar: true, // Show in sidebar
+  },
+  {
+    path: "/forgot-password",
+    name: "Sign In",
+    icon: <DocumentIcon color='inherit' />,
+    component: ForgotPassword,
+    layout: "/auth",
+    sidebar: false, // Hide from sidebar
   },
   {
     name: "Tables",

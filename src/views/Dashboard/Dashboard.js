@@ -48,10 +48,25 @@ export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const history = useHistory();
 
+  const handleNavigateTocustomerdeliverynotice = () => {
+    history.push('/admin/customer-delivery-notice');
+  };
+  const handleNavigateTocustomerorder = () => {
+    history.push('/admin/customer-order');
+  };
   const handleNavigateToSupplierInfo = () => {
     history.push('/admin/supplier-info');
   };
-
+  const handleNavigateTomaterialinquiry = () => {
+    history.push('/admin/material-inquiry');
+  };
+  const handleNavigateTodailywor = () => {
+    history.push('/admin/supplier-info');
+  };
+  const handleNavigateTomaterialreplenishment = () => {
+    history.push('/admin/material-replenishment');
+  };
+  
   const handleNavigateToSupplierInfo1 = () => {
     history.push('/admin/tables');
   };
@@ -226,7 +241,9 @@ const handleNextTable = () => {
               </IconBox>
             </Flex>
             <Text color="gray.400" fontSize="sm">
-              <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+            <Box onClick={handleNavigateToSupplierInfo1} _hover={{ cursor: "pointer" }}>
+                Tap here to view
+              </Box>
             </Text>
           </Flex>
         </Card>
@@ -279,8 +296,9 @@ const handleNextTable = () => {
                 <DocumentIcon h={"24px"} w={"24px"} color={iconBoxInside} />
               </IconBox>
             </Flex>
-            <Text color="gray.400" fontSize="sm">
-              <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+            <Text color="gray.400" fontSize="sm"> <Box onClick={handleNavigateToSupplierInfo1} _hover={{ cursor: "pointer" }}>
+                Tap here to view
+              </Box>
             </Text>
           </Flex>
         </Card>
@@ -333,8 +351,10 @@ const handleNextTable = () => {
                 <CartIcon h={"24px"} w={"24px"} color={iconBoxInside} />
               </IconBox>
             </Flex>
-            <Text color="gray.400" fontSize="sm">
-              <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+            <Text color="gray.400" fontSize="sm"> 
+              <Box onClick={handleNavigateToSupplierInfo1} _hover={{ cursor: "pointer" }}>
+                Tap here to view
+              </Box>
             </Text>
           </Flex>
         </Card>
@@ -388,7 +408,9 @@ const handleNextTable = () => {
               </IconBox>
             </Flex>
             <Text color="gray.400" fontSize="sm">
-              <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+            <Box onClick={handleNavigateToSupplierInfo1} _hover={{ cursor: "pointer" }}>
+                Tap here to view
+              </Box>
             </Text>
           </Flex>
         </Card>
@@ -442,7 +464,9 @@ const handleNextTable = () => {
               </IconBox>
             </Flex>
             <Text color="gray.400" fontSize="sm">
-              <Box _hover={{ cursor: "pointer" }}>Tap here to view</Box>
+            <Box onClick={handleNavigateToSupplierInfo1} _hover={{ cursor: "pointer" }}>
+                Tap here to view
+              </Box>
             </Text>
           </Flex>
         </Card>

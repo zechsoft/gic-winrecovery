@@ -1,7 +1,40 @@
-import React, { useState } from "react";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { UserPlusIcon } from "@heroicons/react/24/solid";
+import React, { useState, useRef, useEffect } from "react";
+
+import {
+  Box,
+  Button,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  IconButton,
+  Tooltip,
+  Input,
+  Select,
+  Flex,
+  Text,
+  InputGroup,
+  InputLeftElement,
+  Tabs,
+  TabList,
+  Tab,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+} from "@chakra-ui/react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+
 import { useHistory } from "react-router-dom";
+
 
 const TABS = [
   { label: "All", value: "all" },

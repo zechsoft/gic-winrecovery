@@ -77,6 +77,12 @@ function Profile() {
       description: "Different people have different taste, especially various types of music.",
       image: ImageArchitect3,
     },
+    {
+      id: 3,
+      name: "Minimalist",
+      description: "Different people have different taste, especially various types of music.",
+      image: ImageArchitect3,
+    },
   ]);
 
   const textColor = useColorModeValue("gray.700", "white");
@@ -443,6 +449,7 @@ function Profile() {
         </Text>
       </Flex>
     </CardHeader>
+    
     <CardBody px="5px">
       <Grid
         templateColumns="repeat(2, 1fr)"
@@ -454,7 +461,7 @@ function Profile() {
                 src={project.image}
                 borderRadius="15px"
                 w="100%"
-                h="200px"
+                h="400px"
                 objectFit="cover"
               />
               <Box

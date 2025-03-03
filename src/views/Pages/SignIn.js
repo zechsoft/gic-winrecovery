@@ -47,11 +47,6 @@ export default function SignIn() {
   // Initialize useHistory
   const history = useHistory();
 
-  // Function to handle navigation to the Sign Up page
-  const handleNavigateToSignUp = () => {
-    history.push("/auth/signup");
-  };
-
   // Function to handle sign in
   const handleSignIn = () => {
     // Simple validation
@@ -237,9 +232,15 @@ export default function SignIn() {
                 />
                 <Text ml="3" fontSize="sm" color={textColor}>Keep me logged In</Text>
               </Flex>
-              <Link href="#" fontSize="sm" fontWeight="medium" color={blueShade} _hover={{ textDecoration: "underline" }}>
-                Forgot Password?
-              </Link>
+              <Link
+  href="/auth/forgot-password"
+  fontSize="sm"
+  fontWeight="medium"
+  color={blueShade}
+  _hover={{ textDecoration: "underline" }}
+>
+  Forgot Password?
+</Link>
             </Flex>
 
             {/* Sign In Button */}
@@ -259,15 +260,14 @@ export default function SignIn() {
             <Flex mt="5" justify="center">
               <Text fontSize="sm" color={textColor}>Not registered yet?</Text>
               <Link
-                href="#"
-                fontSize="sm"
-                fontWeight="bold"
-                color={blueShade}
                 ml="1"
-                onClick={handleNavigateToSignUp}
-                style={{ cursor: "pointer" }}
+                fontSize="sm"
+                fontWeight="medium"
+                color={blueShade}
+                _hover={{ textDecoration: "underline" }}
+                onClick={() => history.push("/auth/signup")}
               >
-                Create an account
+                Create New Account
               </Link>
             </Flex>
           </Flex>

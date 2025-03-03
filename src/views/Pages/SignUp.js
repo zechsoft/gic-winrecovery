@@ -31,7 +31,7 @@ function SignUp() {
   const titleColor = useColorModeValue("gray.700", "blue.500");
   const textColor = useColorModeValue("gray.700", "white");
   const colorIcons = useColorModeValue("gray.700", "white");
-  const bgIcons = useColorModeValue("trasnparent", "navy.700");
+  const bgIcons = useColorModeValue("transparent", "navy.700");
   const bgIconsHover = useColorModeValue("gray.50", "whiteAlpha.100");
 
   // State for form fields
@@ -40,16 +40,17 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  
+  const [otp, setOtp] = useState(""); // State for OTP
+
   const toast = useToast();
   const history = useHistory();
-  
+
   // Default avatars to assign to new users
   const defaultAvatars = [avatar1, avatar2, avatar3];
 
   const handleSignUp = () => {
     // Simple validation
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password || !role || !otp) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields",
@@ -85,9 +86,21 @@ function SignUp() {
       return;
     }
 
+    // OTP validation (for example, OTP should be 6 digits)
+    if (!/^\d{6}$/.test(otp)) {
+      toast({
+        title: "Invalid OTP",
+        description: "OTP must be 6 digits",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     // Get existing registered users or initialize empty array
     const existingUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-    
+
     // Check if email is already registered
     if (existingUsers.some(user => user.email === email)) {
       toast({
@@ -144,6 +157,29 @@ function SignUp() {
     } else {
       history.push("/client/dashboard");
     }
+  };
+
+  const handleSendOtp = () => {
+    // Simple OTP sending logic (for demonstration purposes)
+    if (!email) {
+      toast({
+        title: "Missing email",
+        description: "Please enter your email address",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // Simulate OTP sending
+    toast({
+      title: "OTP Sent",
+      description: "An OTP has been sent to your email address",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   const handleNavigateToSignIn = () => {
@@ -330,7 +366,6 @@ function SignUp() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            {/* Dropdown for Role Selection */}
             <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
               Role
             </FormLabel>
@@ -341,21 +376,45 @@ function SignUp() {
               value={role}
               onChange={(e) => setRole(e.target.value)}
               sx={{
-                fontSize: "sm", // Reduce font size
+                fontSize: "sm",
                 _hover: {
-                  borderColor: "blue.500", // Change hover border color to blue
+                  borderColor: "blue.500",
                 },
                 _focus: {
-                  borderColor: "blue.500", // Change focus border color to blue
-                  boxShadow: "none", // Remove shadow
+                  borderColor: "blue.500",
+                  boxShadow: "none",
                 },
                 "& option": {
-                  fontSize: "sm", // Reduce font size of dropdown options
+                  fontSize: "sm",
                 },
               }}>
               <option value='admin'>Admin</option>
               <option value='client'>Client</option>
             </Select>
+            <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
+              OTP
+            </FormLabel>
+            <Input
+              variant='auth'
+              fontSize='sm'
+              ms='4px'
+              type='text'
+              placeholder='Enter OTP'
+              mb='24px'
+              size='lg'
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+            <Button
+              fontSize='sm'
+              variant='outline'
+              fontWeight='bold'
+              w='100%'
+              h='45'
+              mb='24px'
+              onClick={handleSendOtp}>
+              SEND OTP
+            </Button>
             <FormControl display='flex' alignItems='center' mb='24px'>
               <Switch 
                 id='remember-login' 
