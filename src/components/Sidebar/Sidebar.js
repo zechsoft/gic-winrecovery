@@ -641,7 +641,8 @@ export function SidebarResponsive(props) {
 
   // Define the sidebar background color using Chakra's useColorModeValue
   const sidebarBackgroundColor = useColorModeValue("white", "navy.800");
-
+  const textColor = useColorModeValue("gray.700", "white");
+  
   // Check if any category is open
   useEffect(() => {
     const isAnyCategoryOpen = Object.values(state).some(value => value === true);
@@ -940,7 +941,7 @@ export function SidebarResponsive(props) {
               borderRadius="15px"
               _hover={{
                 bg: hoverColor,
-                transform: "translateX(5px)",
+                transform: "translateX(-5px)",
                 transition: "all 0.3s ease"
               }}
               transition="all 0.3s ease"
@@ -998,7 +999,7 @@ export function SidebarResponsive(props) {
               w="100%"
               _hover={{
                 bg: hoverColor,
-                transform: "translateX(5px)",
+                transform: "translateX(-5px)",
                 transition: "all 0.3s ease"
               }}
               _active={{
@@ -1014,11 +1015,11 @@ export function SidebarResponsive(props) {
                 content: isActive ? '""' : "none",
                 position: "absolute",
                 top: "4",
-                right: "0",
+                left: "0",
                 width: "2px",
                 height: "45%",
                 backgroundColor: "blue.500",
-                borderRadius: "0px 4px 4px 0px",
+                borderRadius: "4px 0px 0px 4px",
               }}
               sx={
                 isActive ? {
@@ -1083,40 +1084,72 @@ export function SidebarResponsive(props) {
   const sidebarRoutes = routes.filter(route => route.sidebar !== false);
   var links = <>{createLinks(sidebarRoutes)}</>;
 
+  // Define slide animations for right side menu
+  const slideInRight = keyframes`
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  `;
+
+  const slideOutRight = keyframes`
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  `;
+
   return (
     <Box display={{ sm: "block", xl: "none" }}>
-      {/* This is the hamburger button that opens the drawer */}
+      {/* New professional circular menu toggle button on right side */}
       <IconButton
         ref={btnRef}
         aria-label="Menu"
         display={{ sm: "flex", xl: "none" }}
         onClick={onOpen}
-        icon={
-          <Icon boxSize="24px" color={hamburgerColor || "inherit"}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 7H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M3 12H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M3 17H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </Icon>
-        }
-        variant="ghost"
-        colorScheme="blue"
-        mr="12px"
-        _hover={{ bg: 'transparent' }}
-        _active={{ bg: 'transparent' }}
-        _focus={{ boxShadow: 'none' }}
+        icon={<FaChevronRight />}
+        colorScheme="whiteAlpha"
+        position="fixed"
+        right="10px"
+        top="50%"
+        transform="translateY(-50%)"
+        zIndex={5}
+        borderRadius="full"
+        boxSize="42px"
+        bg="white"
+        color="blue.500"
+        boxShadow="0 4px 12px rgba(0, 0, 0, 0.15)"
+        transition="all 0.3s ease"
+        _hover={{ 
+          transform: "translateY(-50%) scale(1.05)",
+          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.2)"
+        }}
+        _active={{
+          transform: "translateY(-50%) scale(0.95)",
+        }}
       />
 
-      <Drawer isOpen={isOpen} placement="left" onClose={onClose} finalFocusRef={btnRef}>
+      <Drawer 
+        isOpen={isOpen} 
+        placement="right" 
+        onClose={onClose} 
+        finalFocusRef={btnRef}
+        size="xs"
+      >
         <DrawerOverlay />
-        <DrawerContent bg={sidebarBackgroundColor}>
-          <DrawerCloseButton />
+        <DrawerContent 
+          bg={sidebarBackgroundColor}
+          boxShadow="-10px 0 30px rgba(0, 0, 0, 0.1)"
+        >
+          <DrawerCloseButton 
+            size="lg"
+            borderRadius="full"
+            bg={useColorModeValue("gray.100", "whiteAlpha.100")}
+            _hover={{ bg: useColorModeValue("gray.200", "whiteAlpha.200") }}
+            mt={2}
+            mr={3}
+          />
           <DrawerBody p="0px" className="chakra-drawer__body"
             sx={{
               scrollbarWidth: isScrolling ? "none" : "auto",
               "&::-webkit-scrollbar": {
-                width: isScrolling ? "0px" : "6px",
+                width: isScrolling ? "0px" : "4px",
                 transition: "width 0.3s ease"
               },
               "&::-webkit-scrollbar-track": {
@@ -1128,13 +1161,37 @@ export function SidebarResponsive(props) {
               }
             }}
           >
-            {/* Logo section */}
-            {logo && (
-              <Box pt={"25px"} mb="12px" px="16px">
-                {logo}
-                <HSeparator my="26px" />
-              </Box>
-            )}
+            {/* Company branding and logo section */}
+            <Box
+              bg={useColorModeValue("blue.500", "navy.700")}
+              py={6}
+              px={4}
+              mb={4}
+            >
+              {logo ? (
+                logo
+              ) : (
+                <Flex align="center" justify="center">
+                  <Box
+                    width="40px"
+                    height="40px"
+                    borderRadius="full"
+                    bg="white"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    mr={3}
+                  >
+                    <Text fontWeight="bold" fontSize="xl" color="blue.500">
+                      C
+                    </Text>
+                  </Box>
+                  <Text color="white" fontWeight="bold" fontSize="xl">
+                    Company Name
+                  </Text>
+                </Flex>
+              )}
+            </Box>
 
             <Box mb={contentBottomPadding} p="16px">
               {links}
