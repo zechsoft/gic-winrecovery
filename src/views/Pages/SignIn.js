@@ -10,25 +10,11 @@ import {
   Link,
   Checkbox,
   useColorModeValue,
-  Select,
   useToast,
 } from "@chakra-ui/react";
 import { FcGoogle } from "react-icons/fc";
 import { useHistory } from "react-router-dom";
 import signInImage from "assets/img/signInImage.png";
-
-// Sample user credentials
-const sampleUsers = {
-  admin: {
-    "admin@example.com": { password: "Admin123!", role: "admin" },
-  },
-  client: {
-    "client1@example.com": { password: "Client1!", role: "client" },
-    "client2@example.com": { password: "Client2!", role: "client" },
-    "client3@example.com": { password: "Client3!", role: "client" },
-    "client4@example.com": { password: "Client4!", role: "client" },
-  },
-};
 
 export default function SignIn() {
   const textColor = useColorModeValue("gray.700", "white");
@@ -38,8 +24,8 @@ export default function SignIn() {
   // State for form values
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Loading state for API call
 
   // Toast for notifications
   const toast = useToast();
@@ -48,9 +34,9 @@ export default function SignIn() {
   const history = useHistory();
 
   // Function to handle sign in
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     // Simple validation
-    if (!email || !password || !role) {
+    if (!email || !password) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields",
@@ -61,61 +47,64 @@ export default function SignIn() {
       return;
     }
 
-    // Check if the email exists in the selected role
-    const roleUsers = sampleUsers[role];
-    if (!roleUsers || !roleUsers[email]) {
+    setIsLoading(true); // Start loading
+
+    try {
+      // Make API call to backend
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || "Login failed");
+      }
+
+      // Extract user role from the response
+      const userRole = data.user.role;
+
+      // Success - store user info in localStorage or sessionStorage
+      const userData = {
+        email: email,
+        role: userRole, // Use the role from server response
+        isAuthenticated: true,
+        token: data.token, // Store the JWT token
+      };
+
+      if (rememberMe) {
+        localStorage.setItem("user", JSON.stringify(userData));
+      } else {
+        sessionStorage.setItem("user", JSON.stringify(userData));
+      }
+
+      // Redirect based on role from server response
+      if (userRole === "admin") {
+        history.push("/admin/dashboard");
+      } else {
+        history.push("/client/dashboard");
+      }
+
       toast({
-        title: "Authentication failed",
-        description: "Email not found for selected role",
+        title: "Login Successful",
+        description: `Welcome back!`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (err) {
+      toast({
+        title: "Login Failed",
+        description: err.message || "Invalid email or password",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
-      return;
+    } finally {
+      setIsLoading(false); // Stop loading
     }
-
-    // Check if password is correct
-    const user = roleUsers[email];
-    if (user.password !== password) {
-      toast({
-        title: "Authentication failed",
-        description: "Invalid password",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    // Success - store user info in localStorage
-    const userData = {
-      email,
-      role: user.role,
-      isAuthenticated: true,
-    };
-
-    // Store in localStorage if rememberMe is checked
-    if (rememberMe) {
-      localStorage.setItem("user", JSON.stringify(userData));
-    } else {
-      // Use sessionStorage if not remembering
-      sessionStorage.setItem("user", JSON.stringify(userData));
-    }
-
-    // Redirect based on role
-    if (user.role === "admin") {
-      history.push("/admin/dashboard");
-    } else {
-      history.push("/client/dashboard");
-    }
-
-    toast({
-      title: "Login Successful",
-      description: `Welcome ${email}!`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
   };
 
   return (
@@ -205,24 +194,6 @@ export default function SignIn() {
               />
             </FormControl>
 
-            {/* Role Dropdown */}
-            <FormControl mb="3">
-              <FormLabel fontSize="sm" fontWeight="normal">Role*</FormLabel>
-              <Select
-                placeholder="Select role"
-                border="1px solid #e0e0e0"
-                borderRadius={7}
-                h="50px"
-                p="12px"
-                fontSize="16px"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="admin">Admin</option>
-                <option value="client">Client</option>
-              </Select>
-            </FormControl>
-
             {/* Remember Me and Forgot Password */}
             <Flex mb="5" justify="space-between" align="center">
               <Flex align="center">
@@ -233,15 +204,14 @@ export default function SignIn() {
                 <Text ml="3" fontSize="sm" color={textColor}>Keep me logged In</Text>
               </Flex>
               <Link
-  onClick={() => history.push("/auth/forgot-password")}
-  fontSize="sm"
-  fontWeight="medium"
-  color={blueShade}
-  _hover={{ textDecoration: "underline" }}
-  cursor="pointer"
->
-  Forgot Password?
-</Link>
+                href="/auth/forgot-password"
+                fontSize="sm"
+                fontWeight="medium"
+                color={blueShade}
+                _hover={{ textDecoration: "underline" }}
+              >
+                Forgot Password?
+              </Link>
             </Flex>
 
             {/* Sign In Button */}
@@ -253,6 +223,7 @@ export default function SignIn() {
               py="12px"
               _hover={{ bg: "linear-gradient(to right, #00a1cc, #005bbb)" }}
               onClick={handleSignIn}
+              isLoading={isLoading} // Show loading state
             >
               Sign In
             </Button>
@@ -279,9 +250,9 @@ export default function SignIn() {
             bgImage={`url(${signInImage})`}
             bgSize="cover"
             bgPosition="center"
-            borderTopRightRadius="0px"
-            borderBottomRightRadius="0px"
-            borderBottomLeftRadius="0px"
+            borderTopRightRadius="20px"
+            borderBottomRightRadius="40px"
+            borderBottomLeftRadius="250px"
             display={{ base: "none", md: "block" }}
           />
         </Flex>
