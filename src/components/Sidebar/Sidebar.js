@@ -641,8 +641,10 @@ export function SidebarResponsive(props) {
 
   // Define the sidebar background color using Chakra's useColorModeValue
   const sidebarBackgroundColor = useColorModeValue("white", "navy.800");
-  const textColor = useColorModeValue("gray.700", "white");
-  
+  const buttonBgColor = useColorModeValue("white", "gray.800");
+  const buttonIconColor = useColorModeValue("blue.500", "blue.300");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+
   // Check if any category is open
   useEffect(() => {
     const isAnyCategoryOpen = Object.values(state).some(value => value === true);
@@ -941,7 +943,7 @@ export function SidebarResponsive(props) {
               borderRadius="15px"
               _hover={{
                 bg: hoverColor,
-                transform: "translateX(-5px)",
+                transform: "translateX(5px)",
                 transition: "all 0.3s ease"
               }}
               transition="all 0.3s ease"
@@ -999,7 +1001,7 @@ export function SidebarResponsive(props) {
               w="100%"
               _hover={{
                 bg: hoverColor,
-                transform: "translateX(-5px)",
+                transform: "translateX(5px)",
                 transition: "all 0.3s ease"
               }}
               _active={{
@@ -1015,11 +1017,11 @@ export function SidebarResponsive(props) {
                 content: isActive ? '""' : "none",
                 position: "absolute",
                 top: "4",
-                left: "0",
+                right: "0",
                 width: "2px",
                 height: "45%",
                 backgroundColor: "blue.500",
-                borderRadius: "4px 0px 0px 4px",
+                borderRadius: "0px 4px 4px 0px",
               }}
               sx={
                 isActive ? {
@@ -1084,114 +1086,108 @@ export function SidebarResponsive(props) {
   const sidebarRoutes = routes.filter(route => route.sidebar !== false);
   var links = <>{createLinks(sidebarRoutes)}</>;
 
-  // Define slide animations for right side menu
-  const slideInRight = keyframes`
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  `;
-
-  const slideOutRight = keyframes`
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
+  // Animation style for the drawer
+  const slideInLeft = keyframes`
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
   `;
 
   return (
     <Box display={{ sm: "block", xl: "none" }}>
-      {/* New professional circular menu toggle button on right side */}
-      <IconButton
-        ref={btnRef}
-        aria-label="Menu"
-        display={{ sm: "flex", xl: "none" }}
-        onClick={onOpen}
-        icon={<FaChevronRight />}
-        colorScheme="whiteAlpha"
+      {/* Modified button position - moved slightly to the left */}
+      <Box
         position="fixed"
-        right="10px"
+        left="5px" 
         top="50%"
         transform="translateY(-50%)"
-        zIndex={5}
-        borderRadius="full"
-        boxSize="42px"
-        bg="white"
-        color="blue.500"
-        boxShadow="0 4px 12px rgba(0, 0, 0, 0.15)"
-        transition="all 0.3s ease"
-        _hover={{ 
-          transform: "translateY(-50%) scale(1.05)",
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.2)"
-        }}
-        _active={{
-          transform: "translateY(-50%) scale(0.95)",
-        }}
-      />
+        zIndex="9"
+      >
+        <Box
+          as="button"
+          ref={btnRef}
+          aria-label="Open Menu"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          width="44px" 
+          height="44px" 
+          borderRadius="20px" 
+          bg={buttonBgColor}
+          border="1px solid"
+          borderColor={borderColor}
+          boxShadow="0px 2px 4px rgba(0, 0, 0, 0.1)"
+          onClick={onOpen}
+          transition="all 0.3s ease"
+          _hover={{
+            transform: "scale(1.1)",
+            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)"
+          }}
+        >
+          <Icon 
+            as={FaChevronRight} 
+            color={buttonIconColor} 
+            boxSize="14px"
+          />
+        </Box>
+      </Box>
 
       <Drawer 
         isOpen={isOpen} 
-        placement="right" 
+        placement="left" 
         onClose={onClose} 
         finalFocusRef={btnRef}
         size="xs"
       >
-        <DrawerOverlay />
+        <DrawerOverlay backdropFilter="blur(3px)" />
         <DrawerContent 
           bg={sidebarBackgroundColor}
-          boxShadow="-10px 0 30px rgba(0, 0, 0, 0.1)"
+          maxW="280px" 
+          boxShadow="0 0 15px rgba(0, 0, 0, 0.1)"
+          borderRight="1px solid"
+          borderColor={borderColor}
+          borderTopRightRadius="20px" 
+          borderBottomRightRadius="20px" 
+          sx={{
+            animation: `${slideInLeft} 0.3s ease-out`
+          }}
         >
           <DrawerCloseButton 
-            size="lg"
+            size="sm" 
+            mt={2} 
+            mr={2}
             borderRadius="full"
-            bg={useColorModeValue("gray.100", "whiteAlpha.100")}
-            _hover={{ bg: useColorModeValue("gray.200", "whiteAlpha.200") }}
-            mt={2}
-            mr={3}
+            bg={buttonBgColor}
+            boxShadow="0px 1px 3px rgba(0, 0, 0, 0.1)"
+            _hover={{
+              bg: buttonBgColor,
+              transform: "scale(1.1)"
+            }}
+            transition="all 0.2s ease"
           />
           <DrawerBody p="0px" className="chakra-drawer__body"
             sx={{
-              scrollbarWidth: isScrolling ? "none" : "auto",
+              scrollbarWidth: "thin", 
               "&::-webkit-scrollbar": {
-                width: isScrolling ? "0px" : "4px",
+                width: "6px", 
                 transition: "width 0.3s ease"
               },
               "&::-webkit-scrollbar-track": {
                 background: "transparent",
               },
               "&::-webkit-scrollbar-thumb": {
-                background: "rgba(0, 0, 0, 0.2)",
+                background: isScrolling ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.2)", 
                 borderRadius: "10px",
+                transition: "background 0.3s ease"
               }
             }}
           >
-            {/* Company branding and logo section */}
-            <Box
-              bg={useColorModeValue("blue.500", "navy.700")}
-              py={6}
-              px={4}
-              mb={4}
-            >
-              {logo ? (
-                logo
-              ) : (
-                <Flex align="center" justify="center">
-                  <Box
-                    width="40px"
-                    height="40px"
-                    borderRadius="full"
-                    bg="white"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    mr={3}
-                  >
-                    <Text fontWeight="bold" fontSize="xl" color="blue.500">
-                      C
-                    </Text>
-                  </Box>
-                  <Text color="white" fontWeight="bold" fontSize="xl">
-                    Company Name
-                  </Text>
-                </Flex>
-              )}
-            </Box>
+            {/* Logo section */}
+            {logo && (
+              <Box pt={"20px"} mb="10px" px="16px">
+                {logo}
+                <HSeparator my="20px" />
+              </Box>
+            )}
 
             <Box mb={contentBottomPadding} p="16px">
               {links}
