@@ -35,7 +35,7 @@ import {
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { useHistory } from "react-router-dom";
-import { customerDeliveryNoticeApi } from "../services/customerDeliveryNoticeAPI";
+import { customerDeliveryNoticeApi } from "./services/customerDeliveryNoticeAPI";
 
 const TABS = [
   { label: "All", value: "all" },

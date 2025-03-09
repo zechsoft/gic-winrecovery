@@ -18,8 +18,11 @@ import {
   HStack,
   VStack,
   Collapse,
+  useTheme,
+  keyframes,
 } from "@chakra-ui/react";
 import IconBox from "components/Icons/IconBox";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import { HSeparator } from "components/Separator/Separator";
 import React, { useContext, useRef, useState, useEffect } from "react";
 import { NavLink, useLocation, useHistory } from "react-router-dom";
@@ -34,6 +37,28 @@ import {
   FaChevronRight
 } from "react-icons/fa";
 
+// Define animations
+const slideIn = keyframes`
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+`;
+
+const slideOut = keyframes`
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-100%); opacity: 0; }
+`;
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const pulseAnimation = keyframes`
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+`;
+
 // Sidebar Component
 function Sidebar(props) {
   const location = useLocation();
@@ -42,6 +67,7 @@ function Sidebar(props) {
   const { colorMode } = useColorMode();
   const { sidebarVariant } = props;
   const history = useHistory();
+  const theme = useTheme();
   
   // Get sidebar state from context
   const { sidebarOpen, toggleSidebar, setSidebarOpen } = useContext(SidebarContext);
@@ -54,6 +80,22 @@ function Sidebar(props) {
   const [showFooter, setShowFooter] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
   const [anyCategoryOpen, setAnyCategoryOpen] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
+  // Track if item was clicked
+  const [navigationClicked, setNavigationClicked] = useState(false);
+
+  // Auto-hide sidebar after navigation on smaller screens
+  useEffect(() => {
+    if (navigationClicked && window.innerWidth < 1200) {
+      const timeout = setTimeout(() => {
+        setSidebarOpen(false);
+        setNavigationClicked(false);
+      }, 300); // Delay to allow for animation to play
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [navigationClicked, location.pathname]);
 
   // Handle scroll event to hide footer
   useEffect(() => {
@@ -126,6 +168,7 @@ function Sidebar(props) {
     const activeColor = useColorModeValue("gray.700", "white");
     const inactiveColor = useColorModeValue("gray.400", "gray.400");
     const sidebarActiveShadow = "0px 7px 11px rgba(0, 0, 0, 0.04)";
+    const hoverColor = useColorModeValue("blue.50", "whiteAlpha.100");
 
     return routes.map((prop, key) => {
       // Skip routes that should not be shown in sidebar
@@ -160,6 +203,13 @@ function Sidebar(props) {
               mx="auto"
               ps={{ sm: "10px", xl: "16px" }}
               py="12px"
+              borderRadius="15px"
+              _hover={{
+                bg: hoverColor,
+                transform: "translateX(5px)",
+                transition: "all 0.3s ease"
+              }}
+              transition="all 0.3s ease"
             >
               <Text color={activeColor} fontWeight="bold">
                 {document.documentElement.dir === "rtl"
@@ -170,10 +220,19 @@ function Sidebar(props) {
                 as={isOpen ? FaChevronDown : FaChevronRight} 
                 mr="8px" 
                 color={activeColor}
+                transition="transform 0.3s ease"
+                transform={isOpen ? "rotate(0deg)" : "rotate(0deg)"}
               />
             </Flex>
-            <Collapse in={isOpen}>
-              {createLinks(sidebarViews)} {/* Render sub-items if open */}
+            <Collapse in={isOpen} animateOpacity>
+              <Box 
+                pl={4}
+                borderLeft="1px solid"
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+                ml={4}
+              >
+                {createLinks(sidebarViews)} {/* Render sub-items if open */}
+              </Box>
             </Collapse>
           </Box>
         );
@@ -184,7 +243,11 @@ function Sidebar(props) {
       
       return (
         <Flex key={key} width="100%" position="relative" align="center">
-          <NavLink to={prop.layout + prop.path} style={{ width: hasSecondaryNavbar ? '85%' : '100%' }}>
+          <NavLink 
+            to={prop.layout + prop.path} 
+            style={{ width: hasSecondaryNavbar ? '85%' : '100%' }}
+            onClick={() => setNavigationClicked(true)}
+          >
             <Button
               boxSize="initial"
               justifyContent="flex-start"
@@ -197,7 +260,11 @@ function Sidebar(props) {
               py="12px"
               borderRadius="15px"
               w="100%"
-              _hover="none"
+              _hover={{
+                bg: hoverColor,
+                transform: "translateX(5px)",
+                transition: "all 0.3s ease"
+              }}
               _active={{
                 bg: "inherit",
                 transform: "none",
@@ -206,6 +273,7 @@ function Sidebar(props) {
               _focus={{
                 boxShadow: "none",
               }}
+              transition="all 0.3s ease"
               _after={{
                 content: isActive ? '""' : "none",
                 position: "absolute",
@@ -216,6 +284,11 @@ function Sidebar(props) {
                 backgroundColor: "blue.500",
                 borderRadius: "0px 4px 4px 0px",
               }}
+              sx={
+                isActive ? {
+                  animation: `${pulseAnimation} 2s infinite ease-in-out`
+                } : {}
+              }
             >
               <Flex position="relative">
                 {typeof prop.icon === "string" ? (
@@ -227,6 +300,7 @@ function Sidebar(props) {
                     h="30px"
                     w="30px"
                     me="12px"
+                    transition="all 0.3s ease"
                   >
                     {prop.icon}
                   </IconBox>
@@ -257,6 +331,8 @@ function Sidebar(props) {
                 e.stopPropagation();
                 toggleSecondaryNavbar(prop);
               }}
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.1)" }}
             />
           )}
         </Flex>
@@ -272,7 +348,7 @@ function Sidebar(props) {
     const textColor = useColorModeValue("gray.700", "white");
     
     return (
-      <Collapse in={secondaryNavbarOpen}>
+      <Collapse in={secondaryNavbarOpen} animateOpacity>
         <Box
           bg={bgColor}
           borderRadius="15px"
@@ -280,19 +356,43 @@ function Sidebar(props) {
           mt={2}
           mb={4}
           boxShadow="0 4px 12px 0 rgba(0, 0, 0, 0.05)"
+          sx={{
+            animation: `${fadeIn} 0.3s ease-in-out`
+          }}
         >
           <Text fontWeight="bold" mb={2} color={textColor}>
             {route.name} Details
           </Text>
           <VStack align="stretch" spacing={2}>
             {/* Example secondary navbar content */}
-            <Button variant="ghost" size="sm" justifyContent="flex-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              justifyContent="flex-start"
+              transition="all 0.3s ease"
+              _hover={{ transform: "translateX(5px)", bg: useColorModeValue("blue.50", "whiteAlpha.100") }}
+              onClick={() => setNavigationClicked(true)}
+            >
               View Details
             </Button>
-            <Button variant="ghost" size="sm" justifyContent="flex-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              justifyContent="flex-start" 
+              transition="all 0.3s ease"
+              _hover={{ transform: "translateX(5px)", bg: useColorModeValue("blue.50", "whiteAlpha.100") }}
+              onClick={() => setNavigationClicked(true)}
+            >
               Edit {route.name}
             </Button>
-            <Button variant="ghost" size="sm" justifyContent="flex-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              justifyContent="flex-start"
+              transition="all 0.3s ease"
+              _hover={{ transform: "translateX(5px)", bg: useColorModeValue("blue.50", "whiteAlpha.100") }}
+              onClick={() => setNavigationClicked(true)}
+            >
               Settings
             </Button>
           </VStack>
@@ -323,7 +423,7 @@ function Sidebar(props) {
         borderTopRadius="15px"
         boxShadow="0 -4px 12px 0 rgba(0, 0, 0, 0.05)"
         transform={showFooter ? "translateY(0)" : "translateY(70%)"}
-        transition="transform 0.3s ease"
+        transition="transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
         opacity={isScrolling ? 0.2 : 1}
         _hover={{ opacity: 1 }}
         zIndex={2}
@@ -341,11 +441,20 @@ function Sidebar(props) {
           aria-label={showFooter ? "Hide footer" : "Show footer"}
           bg={bgColor}
           boxShadow="0 -4px 12px 0 rgba(0, 0, 0, 0.05)"
+          _hover={{ transform: "translateX(-50%) scale(1.1)" }}
+          transition="transform 0.3s ease"
         />
         
         <Flex direction="column" align="center">
           <Flex align="center" mb={2}>
-            <Avatar size="md" name="User Name" src="/path/to/user-image.jpg" mr={3} />
+            <Avatar 
+              size="md" 
+              name="User Name" 
+              src="/path/to/user-image.jpg" 
+              mr={3}
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
+            />
             <VStack spacing={0} align="start">
               <Text fontWeight="bold" fontSize="sm" color={textColor}>
                 User Name
@@ -365,6 +474,8 @@ function Sidebar(props) {
               variant="ghost"
               colorScheme="blue"
               size="sm"
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.2)" }}
             />
             <IconButton
               aria-label="Twitter"
@@ -372,6 +483,8 @@ function Sidebar(props) {
               variant="ghost"
               colorScheme="blue"
               size="sm"
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.2)" }}
             />
             <IconButton
               aria-label="Instagram"
@@ -379,6 +492,8 @@ function Sidebar(props) {
               variant="ghost"
               colorScheme="blue"
               size="sm"
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.2)" }}
             />
           </HStack>
           
@@ -390,6 +505,8 @@ function Sidebar(props) {
             mt={2}
             onClick={handleLogout}
             colorScheme="blue"
+            transition="all 0.3s ease"
+            _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
           >
             Logout
           </Button>
@@ -423,7 +540,7 @@ function Sidebar(props) {
 
   // Define the brand (logo or header section)
   const brand = (
-    <Box pt={"25px"} mb="12px">
+    <Box pt={"25px"} mb="12px" transition="all 0.3s ease">
       {logo}
       <HSeparator my="26px" />
     </Box>
@@ -432,11 +549,16 @@ function Sidebar(props) {
   // Calculate bottom padding based on secondary navbar and category state
   const contentBottomPadding = anyCategoryOpen ? "20px" : (secondaryNavbarOpen ? "150px" : "80px");
 
+  // Animation styles based on sidebar state
+  const sidebarAnimation = sidebarOpen 
+    ? `${slideIn} 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275)` 
+    : `${slideOut} 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
+
   return (
     <Box ref={mainPanel}>
       {/* Desktop View - toggled sidebar */}
       <Box
-        display={{ sm: "none", xl: sidebarOpen ? "block" : "none" }}
+        display={{ sm: "none", xl: "block" }}
         position="fixed"
         top="0"
         left="0"
@@ -449,6 +571,8 @@ function Sidebar(props) {
         boxShadow="0 4px 12px 0 rgba(0, 0, 0, 0.05)"
         overflowY="auto"
         onClick={(e) => e.stopPropagation()}
+        transform={sidebarOpen ? "translateX(0)" : "translateX(-100%)"}
+        animation={sidebarAnimation}
         sx={{
           scrollbarWidth: isScrolling ? "none" : "auto",
           "&::-webkit-scrollbar": {
@@ -491,6 +615,10 @@ function Sidebar(props) {
           bg="rgba(0,0,0,0.5)"
           zIndex="5"
           onClick={() => setSidebarOpen(false)}
+          sx={{
+            animation: `${fadeIn} 0.3s ease-in-out`
+          }}
+          backdropFilter="blur(3px)"
         />
       )}
     </Box>
@@ -502,13 +630,14 @@ export function SidebarResponsive(props) {
   const { logo, routes, colorMode, hamburgerColor, ...rest } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
-  const [state, setState] = React.useState({}); // Added missing state declaration
+  const [state, setState] = React.useState({});
   const [showFooter, setShowFooter] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
   const [secondaryNavbarOpen, setSecondaryNavbarOpen] = useState(false);
   const [activeSecondaryRoute, setActiveSecondaryRoute] = useState(null);
   const [anyCategoryOpen, setAnyCategoryOpen] = useState(false);
   const history = useHistory();
+  const [navigationClicked, setNavigationClicked] = useState(false);
 
   // Define the sidebar background color using Chakra's useColorModeValue
   const sidebarBackgroundColor = useColorModeValue("white", "navy.800");
@@ -518,6 +647,18 @@ export function SidebarResponsive(props) {
     const isAnyCategoryOpen = Object.values(state).some(value => value === true);
     setAnyCategoryOpen(isAnyCategoryOpen);
   }, [state]);
+
+  // Auto-close drawer after navigation on mobile
+  useEffect(() => {
+    if (navigationClicked && isOpen) {
+      const timeout = setTimeout(() => {
+        onClose();
+        setNavigationClicked(false);
+      }, 300); // Slight delay to allow for animation
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [navigationClicked, location.pathname, isOpen, onClose]);
 
   // Handle scroll event for responsive sidebar
   useEffect(() => {
@@ -592,9 +733,10 @@ export function SidebarResponsive(props) {
     
     const bgColor = useColorModeValue("white", "navy.700");
     const textColor = useColorModeValue("gray.700", "white");
+    const hoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
     
     return (
-      <Collapse in={secondaryNavbarOpen}>
+      <Collapse in={secondaryNavbarOpen} animateOpacity>
         <Box
           bg={bgColor}
           borderRadius="15px"
@@ -602,18 +744,42 @@ export function SidebarResponsive(props) {
           mt={2}
           mb={4}
           boxShadow="0 4px 12px 0 rgba(0, 0, 0, 0.05)"
+          sx={{
+            animation: `${fadeIn} 0.3s ease-in-out`
+          }}
         >
           <Text fontWeight="bold" mb={2} color={textColor}>
             {route.name} Details
           </Text>
           <VStack align="stretch" spacing={2}>
-            <Button variant="ghost" size="sm" justifyContent="flex-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              justifyContent="flex-start"
+              transition="all 0.3s ease"
+              _hover={{ transform: "translateX(5px)", bg: hoverBg }}
+              onClick={() => setNavigationClicked(true)}
+            >
               View Details
             </Button>
-            <Button variant="ghost" size="sm" justifyContent="flex-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              justifyContent="flex-start"
+              transition="all 0.3s ease"
+              _hover={{ transform: "translateX(5px)", bg: hoverBg }}
+              onClick={() => setNavigationClicked(true)}
+            >
               Edit {route.name}
             </Button>
-            <Button variant="ghost" size="sm" justifyContent="flex-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              justifyContent="flex-start"
+              transition="all 0.3s ease"
+              _hover={{ transform: "translateX(5px)", bg: hoverBg }}
+              onClick={() => setNavigationClicked(true)}
+            >
               Settings
             </Button>
           </VStack>
@@ -639,7 +805,7 @@ export function SidebarResponsive(props) {
         borderTopRadius="15px"
         boxShadow="0 -4px 12px 0 rgba(0, 0, 0, 0.05)"
         transform={showFooter ? "translateY(0)" : "translateY(70%)"}
-        transition="transform 0.3s ease"
+        transition="transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
         opacity={isScrolling ? 0.2 : 1}
         _hover={{ opacity: 1 }}
         zIndex={2}
@@ -657,11 +823,20 @@ export function SidebarResponsive(props) {
           aria-label={showFooter ? "Hide footer" : "Show footer"}
           bg={bgColor}
           boxShadow="0 -4px 12px 0 rgba(0, 0, 0, 0.05)"
+          _hover={{ transform: "translateX(-50%) scale(1.1)" }}
+          transition="transform 0.3s ease"
         />
         
         <Flex direction="column" align="center">
           <Flex align="center" mb={2}>
-            <Avatar size="md" name="User Name" src="/path/to/user-image.jpg" mr={3} />
+            <Avatar 
+              size="md" 
+              name="User Name" 
+              src="/path/to/user-image.jpg" 
+              mr={3}
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
+            />
             <VStack spacing={0} align="start">
               <Text fontWeight="bold" fontSize="sm" color={textColor}>
                 User Name
@@ -681,6 +856,8 @@ export function SidebarResponsive(props) {
               variant="ghost"
               colorScheme="blue"
               size="sm"
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.2)" }}
             />
             <IconButton
               aria-label="Twitter"
@@ -688,6 +865,8 @@ export function SidebarResponsive(props) {
               variant="ghost"
               colorScheme="blue"
               size="sm"
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.2)" }}
             />
             <IconButton
               aria-label="Instagram"
@@ -695,6 +874,8 @@ export function SidebarResponsive(props) {
               variant="ghost"
               colorScheme="blue"
               size="sm"
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.2)" }}
             />
           </HStack>
           
@@ -706,6 +887,8 @@ export function SidebarResponsive(props) {
             mt={2}
             onClick={handleLogout}
             colorScheme="blue"
+            transition="all 0.3s ease"
+            _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
           >
             Logout
           </Button>
@@ -721,6 +904,7 @@ export function SidebarResponsive(props) {
     const activeColor = useColorModeValue("gray.700", "white");
     const inactiveColor = useColorModeValue("gray.400", "gray.400");
     const sidebarActiveShadow = "0px 7px 11px rgba(0, 0, 0, 0.04)";
+    const hoverColor = useColorModeValue("blue.50", "whiteAlpha.100");
 
     return routes.map((prop, key) => {
       // Skip routes that should not be shown in sidebar
@@ -753,6 +937,13 @@ export function SidebarResponsive(props) {
               mx="auto"
               ps={{ sm: "10px", xl: "16px" }}
               py="12px"
+              borderRadius="15px"
+              _hover={{
+                bg: hoverColor,
+                transform: "translateX(5px)",
+                transition: "all 0.3s ease"
+              }}
+              transition="all 0.3s ease"
             >
               <Text color={activeColor} fontWeight="bold">
                 {document.documentElement.dir === "rtl"
@@ -763,10 +954,19 @@ export function SidebarResponsive(props) {
                 as={state[prop.state] ? FaChevronDown : FaChevronRight} 
                 mr="8px" 
                 color={activeColor}
+                transition="transform 0.3s ease"
+                transform={state[prop.state] ? "rotate(0deg)" : "rotate(0deg)"}
               />
             </Flex>
-            <Collapse in={state[prop.state]}>
-              {createLinks(sidebarViews)}
+            <Collapse in={state[prop.state]} animateOpacity>
+              <Box 
+                pl={4}
+                borderLeft="1px solid"
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+                ml={4}
+              >
+                {createLinks(sidebarViews)}
+              </Box>
             </Collapse>
           </Box>
         );
@@ -777,7 +977,13 @@ export function SidebarResponsive(props) {
       
       return (
         <Flex key={key} width="100%" position="relative" align="center">
-          <NavLink to={prop.layout + prop.path} style={{ width: hasSecondaryNavbar ? '85%' : '100%' }} onClick={onClose}>
+          <NavLink 
+            to={prop.layout + prop.path} 
+            style={{ width: hasSecondaryNavbar ? '85%' : '100%' }}
+            onClick={() => {
+              setNavigationClicked(true);
+            }}
+          >
             <Button
               boxSize="initial"
               justifyContent="flex-start"
@@ -790,7 +996,11 @@ export function SidebarResponsive(props) {
               py="12px"
               borderRadius="15px"
               w="100%"
-              _hover="none"
+              _hover={{
+                bg: hoverColor,
+                transform: "translateX(5px)",
+                transition: "all 0.3s ease"
+              }}
               _active={{
                 bg: "inherit",
                 transform: "none",
@@ -799,6 +1009,7 @@ export function SidebarResponsive(props) {
               _focus={{
                 boxShadow: "none",
               }}
+              transition="all 0.3s ease"
               _after={{
                 content: isActive ? '""' : "none",
                 position: "absolute",
@@ -809,6 +1020,11 @@ export function SidebarResponsive(props) {
                 backgroundColor: "blue.500",
                 borderRadius: "0px 4px 4px 0px",
               }}
+              sx={
+                isActive ? {
+                  animation: `${pulseAnimation} 2s infinite ease-in-out`
+                } : {}
+              }
             >
               <Flex position="relative">
                 {typeof prop.icon === "string" ? (
@@ -820,6 +1036,7 @@ export function SidebarResponsive(props) {
                     h="30px"
                     w="30px"
                     me="12px"
+                    transition="all 0.3s ease"
                   >
                     {prop.icon}
                   </IconBox>
@@ -850,6 +1067,8 @@ export function SidebarResponsive(props) {
                 e.stopPropagation();
                 toggleSecondaryNavbar(prop);
               }}
+              transition="all 0.3s ease"
+              _hover={{ transform: "scale(1.1)" }}
             />
           )}
         </Flex>
@@ -866,8 +1085,31 @@ export function SidebarResponsive(props) {
 
   return (
     <Box display={{ sm: "block", xl: "none" }}>
-      <Drawer isOpen={isOpen} placement="right" onClose={onClose} finalFocusRef={btnRef}>
-        <DrawerOverlay onClick={onClose} />
+      {/* This is the hamburger button that opens the drawer */}
+      <IconButton
+        ref={btnRef}
+        aria-label="Menu"
+        display={{ sm: "flex", xl: "none" }}
+        onClick={onOpen}
+        icon={
+          <Icon boxSize="24px" color={hamburgerColor || "inherit"}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 7H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M3 12H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M3 17H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </Icon>
+        }
+        variant="ghost"
+        colorScheme="blue"
+        mr="12px"
+        _hover={{ bg: 'transparent' }}
+        _active={{ bg: 'transparent' }}
+        _focus={{ boxShadow: 'none' }}
+      />
+
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose} finalFocusRef={btnRef}>
+        <DrawerOverlay />
         <DrawerContent bg={sidebarBackgroundColor}>
           <DrawerCloseButton />
           <DrawerBody p="0px" className="chakra-drawer__body"
@@ -886,6 +1128,14 @@ export function SidebarResponsive(props) {
               }
             }}
           >
+            {/* Logo section */}
+            {logo && (
+              <Box pt={"25px"} mb="12px" px="16px">
+                {logo}
+                <HSeparator my="26px" />
+              </Box>
+            )}
+
             <Box mb={contentBottomPadding} p="16px">
               {links}
               
@@ -903,5 +1153,4 @@ export function SidebarResponsive(props) {
     </Box>
   );
 }
-
 export default Sidebar;
