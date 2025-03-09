@@ -13,7 +13,7 @@ import {
   Icon,
   Divider,
   Tooltip,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import { FiSearch, FiSend, FiPaperclip, FiMoreVertical } from "react-icons/fi";
 import axios from "axios";
@@ -63,9 +63,9 @@ export default function Messages() {
   // Fetch messages when a user is selected
   useEffect(() => {
     if (selectedChat) {
-      setMessages([]);  // Clear previous messages first
+      setMessages([]); // Clear previous messages first
       axios
-        .get(`http://localhost:5000/api/messages/${currentUser}/${selectedChat.username}`)
+        .get(`http://localhost:5000/api/chat/messages/${currentUser}/${selectedChat.username}`)
         .then((response) => {
           console.log("Fetched Messages:", response.data);
           setMessages(response.data);
@@ -97,26 +97,26 @@ export default function Messages() {
     }
 
     try {
-      const payload = { 
-        sender: currentUser, 
-        receiver: selectedChat.username, 
+      const payload = {
+        sender: currentUser,
+        receiver: selectedChat.username,
         message: newMessage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
       console.log("Sending Message:", payload);
 
-      const response = await axios.post("http://localhost:5000/api/messages/send", payload);
+      const response = await axios.post("http://localhost:5000/api/chat/messages/send", payload);
       console.log("Message Sent Response:", response.data);
 
       setMessages([...messages, payload]);
       setNewMessage("");
-      
+
       toast({
         title: "Message sent",
         status: "success",
         duration: 1000,
         isClosable: true,
-        position: "top-right"
+        position: "top-right",
       });
     } catch (error) {
       console.error("Error sending message:", error);
@@ -132,7 +132,7 @@ export default function Messages() {
 
   // Handle Enter key press
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
@@ -142,10 +142,10 @@ export default function Messages() {
     <Box mt={16} bg={bgForm} p={6} boxShadow="xl" borderRadius="20px" maxW="1300px" mx="auto">
       <Flex direction="row" height="80vh">
         {/* Sidebar */}
-        <Box 
-          w={{ base: "100%", md: "30%" }} 
-          borderRight="1px solid" 
-          borderColor={borderColor} 
+        <Box
+          w={{ base: "100%", md: "30%" }}
+          borderRight="1px solid"
+          borderColor={borderColor}
           p={4}
           bg={sidebarBg}
           borderTopLeftRadius="20px"
@@ -154,72 +154,68 @@ export default function Messages() {
           <Text fontSize="2xl" color={textColor} fontWeight="bold" mb={4}>
             Messages
           </Text>
-          
+
           <InputGroup mb={4}>
-            <Input 
-              placeholder="Search or start a new chat" 
-              value={search} 
-              onChange={(e) => setSearch(e.target.value)} 
-              borderRadius="lg" 
+            <Input
+              placeholder="Search or start a new chat"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              borderRadius="lg"
               bg={inputBg}
               border="1px solid"
               borderColor={borderColor}
-              _focus={{ 
-                borderColor: "blue.400", 
-                boxShadow: "0 0 0 1px blue.400" 
+              _focus={{
+                borderColor: "blue.400",
+                boxShadow: "0 0 0 1px blue.400",
               }}
             />
             <InputRightElement>
               <Icon as={FiSearch} color="gray.500" />
             </InputRightElement>
           </InputGroup>
-          
+
           <Divider mb={4} />
-          
+
           <Text fontSize="sm" color="gray.500" mb={2} fontWeight="medium">
             RECENT CONVERSATIONS
           </Text>
-          
+
           <Flex direction="column" gap={2} overflowY="auto" maxH="calc(80vh - 180px)">
-            {chats.filter(chat => chat.username.toLowerCase().includes(search.toLowerCase())).map((chat, index) => (
-              <Flex 
-                key={index} 
-                align="center" 
-                p={3} 
-                bg={selectedChat?.username === chat.username ? selectedChatBg : "transparent"} 
-                color={selectedChat?.username === chat.username ? "blue.500" : textColor}
-                borderRadius="md" 
-                _hover={{ bg: chatHoverBg }} 
-                onClick={() => setSelectedChat(chat)} 
-                cursor="pointer"
-                transition="all 0.2s"
-              >
-                <Avatar size="md" mr={3} name={chat.username} />
-                <Box flex="1">
-                  <Text fontWeight="bold">{chat.username}</Text>
-                  <Text fontSize="sm" color="gray.500" noOfLines={1}>
-                    {chat.lastMessage || "Start a conversation"}
-                  </Text>
-                </Box>
-                {chat.unread && (
-                  <Box 
-                    bg="blue.500" 
-                    borderRadius="full" 
-                    w="6px" 
-                    h="6px" 
-                    ml={2} 
-                  />
-                )}
-              </Flex>
-            ))}
+            {chats
+              .filter((chat) => chat.username.toLowerCase().includes(search.toLowerCase()))
+              .map((chat, index) => (
+                <Flex
+                  key={index}
+                  align="center"
+                  p={3}
+                  bg={selectedChat?.username === chat.username ? selectedChatBg : "transparent"}
+                  color={selectedChat?.username === chat.username ? "blue.500" : textColor}
+                  borderRadius="md"
+                  _hover={{ bg: chatHoverBg }}
+                  onClick={() => setSelectedChat(chat)}
+                  cursor="pointer"
+                  transition="all 0.2s"
+                >
+                  <Avatar size="md" mr={3} name={chat.username} />
+                  <Box flex="1">
+                    <Text fontWeight="bold">{chat.username}</Text>
+                    <Text fontSize="sm" color="gray.500" noOfLines={1}>
+                      {chat.lastMessage || "Start a conversation"}
+                    </Text>
+                  </Box>
+                  {chat.unread && (
+                    <Box bg="blue.500" borderRadius="full" w="6px" h="6px" ml={2} />
+                  )}
+                </Flex>
+              ))}
           </Flex>
         </Box>
 
         {/* Chat Area */}
-        <Box 
-          w={{ base: "0%", md: "70%" }} 
-          p={0} 
-          display="flex" 
+        <Box
+          w={{ base: "0%", md: "70%" }}
+          p={0}
+          display="flex"
           flexDirection="column"
           borderTopRightRadius="20px"
           borderBottomRightRadius="20px"
@@ -229,11 +225,11 @@ export default function Messages() {
           {selectedChat ? (
             <>
               {/* Chat Header */}
-              <Flex 
-                align="center" 
-                justify="space-between" 
-                p={4} 
-                borderBottom="1px solid" 
+              <Flex
+                align="center"
+                justify="space-between"
+                p={4}
+                borderBottom="1px solid"
                 borderColor={borderColor}
                 bg={useColorModeValue("white", "gray.800")}
               >
@@ -252,12 +248,12 @@ export default function Messages() {
                   </Button>
                 </Tooltip>
               </Flex>
-              
+
               {/* Messages Area */}
-              <Box 
-                flex="1" 
-                overflowY="auto" 
-                p={4} 
+              <Box
+                flex="1"
+                overflowY="auto"
+                p={4}
                 bg={useColorModeValue("gray.50", "gray.900")}
                 css={{
                   "&::-webkit-scrollbar": {
@@ -273,8 +269,8 @@ export default function Messages() {
                 }}
               >
                 {messages.map((msg, i) => (
-                  <Flex 
-                    key={i} 
+                  <Flex
+                    key={i}
                     justify={msg.sender === currentUser ? "flex-end" : "flex-start"}
                     mb={4}
                   >
@@ -282,7 +278,9 @@ export default function Messages() {
                       <Avatar size="sm" mr={2} name={msg.sender} />
                     )}
                     <Box
-                      bg={msg.sender === currentUser ? messageBubbleSent : messageBubbleReceived}
+                      bg={
+                        msg.sender === currentUser ? messageBubbleSent : messageBubbleReceived
+                      }
                       color={msg.sender === currentUser ? "white" : textColor}
                       borderRadius="lg"
                       px={4}
@@ -291,13 +289,16 @@ export default function Messages() {
                     >
                       <Text>{msg.message}</Text>
                       <Text fontSize="xs" textAlign="right" mt={1} opacity={0.7}>
-                        {new Date(msg.timestamp || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        {new Date(msg.timestamp || Date.now()).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </Text>
                     </Box>
                   </Flex>
                 ))}
               </Box>
-              
+
               {/* Message Input */}
               <FormControl p={4} borderTop="1px solid" borderColor={borderColor}>
                 <Flex>
@@ -317,15 +318,15 @@ export default function Messages() {
                       flex="1"
                       border="1px solid"
                       borderColor={borderColor}
-                      _focus={{ 
-                        borderColor: "blue.400", 
-                        boxShadow: "0 0 0 1px blue.400" 
+                      _focus={{
+                        borderColor: "blue.400",
+                        boxShadow: "0 0 0 1px blue.400",
                       }}
                     />
                     <InputRightElement width="4rem">
-                      <Button 
-                        h="1.75rem" 
-                        size="sm" 
+                      <Button
+                        h="1.75rem"
+                        size="sm"
                         colorScheme="blue"
                         borderRadius="full"
                         onClick={sendMessage}
@@ -338,20 +339,15 @@ export default function Messages() {
               </FormControl>
             </>
           ) : (
-            <Flex 
-              direction="column" 
-              align="center" 
-              justify="center" 
+            <Flex
+              direction="column"
+              align="center"
+              justify="center"
               height="100%"
               bg={useColorModeValue("gray.50", "gray.800")}
               p={10}
             >
-              <Box
-                bg="blue.50"
-                p={6}
-                borderRadius="full"
-                mb={4}
-              >
+              <Box bg="blue.50" p={6} borderRadius="full" mb={4}>
                 <Icon as={FiSend} color="blue.500" boxSize={10} />
               </Box>
               <Text fontSize="xl" fontWeight="bold" color={textColor} textAlign="center" mb={4}>

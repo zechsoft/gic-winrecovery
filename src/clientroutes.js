@@ -35,7 +35,7 @@ var clientRoutes = [
     path: "/profile",
     name: "Profile",
     icon: <PersonIcon color='inherit' />,
-    secondaryNavbar: true,
+    
     component: Profile,
     layout: "/client",
     sidebar: true, // Show in sidebar
@@ -95,13 +95,15 @@ var clientRoutes = [
     name: "Tables",
     category: "account",
     state: "pageCollapse",
+    secondaryNavbar: true,
+    layout: "/client",
     sidebar: true, // Show in sidebar
     views: [
       {
         path: "/supplier-info",
         name: "Supplier Info",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: SupplierInfo,
         layout: "/client",
         sidebar: true, // Show in sidebar
@@ -110,7 +112,7 @@ var clientRoutes = [
         path: "/customer-order",
         name: "Customer Order",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: CustomerOrder,
         layout: "/client",
         sidebar: true, // Show in sidebar
@@ -119,7 +121,7 @@ var clientRoutes = [
         path: "/material-inquiry",
         name: "Material Inquiry",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: MaterialInquiry,
         layout: "/client",
         sidebar: true, // Show in sidebar
@@ -128,7 +130,7 @@ var clientRoutes = [
         path: "/material-replenishment",
         name: "Material Replenish",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: MaterialReplenishment,
         layout: "/client",
         sidebar: true, // Show in sidebar
@@ -137,7 +139,7 @@ var clientRoutes = [
         path: "/customer-delivery-notice",
         name: "Customer Delivery",
         icon: <StatsIcon color='inherit' />,
-        secondaryNavbar: true,
+        
         component: CustomerDeliveryNotice,
         layout: "/client",
         sidebar: true, // Show in sidebar

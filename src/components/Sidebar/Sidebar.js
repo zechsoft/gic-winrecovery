@@ -53,6 +53,7 @@ function Sidebar(props) {
   // Footer states
   const [showFooter, setShowFooter] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [anyCategoryOpen, setAnyCategoryOpen] = useState(false);
 
   // Handle scroll event to hide footer
   useEffect(() => {
@@ -83,6 +84,12 @@ function Sidebar(props) {
     };
   }, []);
 
+  // Check if any category is open
+  useEffect(() => {
+    const isAnyCategoryOpen = Object.values(state).some(value => value === true);
+    setAnyCategoryOpen(isAnyCategoryOpen);
+  }, [state]);
+
   // activeRoute function to check if the current route is active
   const activeRoute = (routeName) => {
     return location.pathname === routeName ? "active" : "";
@@ -97,6 +104,19 @@ function Sidebar(props) {
       setActiveSecondaryRoute(route.path);
       setSecondaryNavbarOpen(true);
     }
+  };
+
+  // Logout function
+  const handleLogout = () => {
+    // Clear any auth tokens or user data
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    
+    // You can add additional cleanup here
+    console.log("User logged out");
+    
+    // Redirect to sign-in page
+    history.push("/auth/signin");
   };
 
   const createLinks = (routes) => {
@@ -164,7 +184,7 @@ function Sidebar(props) {
       
       return (
         <Flex key={key} width="100%" position="relative" align="center">
-          <NavLink to={prop.layout + prop.path} style={{ width: '100%' }}>
+          <NavLink to={prop.layout + prop.path} style={{ width: hasSecondaryNavbar ? '85%' : '100%' }}>
             <Button
               boxSize="initial"
               justifyContent="flex-start"
@@ -287,11 +307,10 @@ function Sidebar(props) {
     const textColor = useColorModeValue("gray.700", "white");
     const iconColor = useColorModeValue("blue.500", "blue.400");
     
-    const handleLogout = () => {
-      // Your logout logic here
-      console.log("User logged out");
-      // history.push("/auth/signin");
-    };
+    // Don't show footer if any category is open
+    if (anyCategoryOpen) {
+      return null;
+    }
     
     return (
       <Box
@@ -410,9 +429,8 @@ function Sidebar(props) {
     </Box>
   );
 
-  // Calculate bottom padding based on secondary navbar
-  // Move footer up if secondary navbar is not open
-  const contentBottomPadding = secondaryNavbarOpen ? "150px" : "80px";
+  // Calculate bottom padding based on secondary navbar and category state
+  const contentBottomPadding = anyCategoryOpen ? "20px" : (secondaryNavbarOpen ? "150px" : "80px");
 
   return (
     <Box ref={mainPanel}>
@@ -452,7 +470,7 @@ function Sidebar(props) {
             <Box>{links}</Box>
             
             {/* Secondary Navbar */}
-            {activeSecondaryRoute && (
+            {activeSecondaryRoute && !anyCategoryOpen && (
               <SecondaryNavbar route={routes.find(r => r.path === activeSecondaryRoute)} />
             )}
           </Stack>
@@ -489,9 +507,17 @@ export function SidebarResponsive(props) {
   const [isScrolling, setIsScrolling] = useState(false);
   const [secondaryNavbarOpen, setSecondaryNavbarOpen] = useState(false);
   const [activeSecondaryRoute, setActiveSecondaryRoute] = useState(null);
+  const [anyCategoryOpen, setAnyCategoryOpen] = useState(false);
+  const history = useHistory();
 
   // Define the sidebar background color using Chakra's useColorModeValue
   const sidebarBackgroundColor = useColorModeValue("white", "navy.800");
+
+  // Check if any category is open
+  useEffect(() => {
+    const isAnyCategoryOpen = Object.values(state).some(value => value === true);
+    setAnyCategoryOpen(isAnyCategoryOpen);
+  }, [state]);
 
   // Handle scroll event for responsive sidebar
   useEffect(() => {
@@ -531,6 +557,19 @@ export function SidebarResponsive(props) {
       setActiveSecondaryRoute(route.path);
       setSecondaryNavbarOpen(true);
     }
+  };
+
+  // Logout function for responsive view
+  const handleLogout = () => {
+    // Clear any auth tokens or user data
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    
+    // Close the drawer
+    onClose();
+    
+    // Redirect to sign-in page
+    history.push("/auth/signin");
   };
 
   // Find active route with secondaryNavbar flag
@@ -588,12 +627,10 @@ export function SidebarResponsive(props) {
     const bgColor = useColorModeValue("white", "navy.800");
     const textColor = useColorModeValue("gray.700", "white");
     
-    const handleLogout = () => {
-      // Your logout logic here
-      console.log("User logged out");
-      onClose();
-      // history.push("/auth/signin");
-    };
+    // Don't show footer if any category is open
+    if (anyCategoryOpen) {
+      return null;
+    }
     
     return (
       <Box
@@ -692,7 +729,7 @@ export function SidebarResponsive(props) {
       }
 
       if (prop.category) {
-        const isOpen = false; // Default closed in responsive view
+        const isOpen = state[prop.state]; // Check if category open in state
         
         // Filter views that should appear in sidebar
         const sidebarViews = prop.views.filter(view => view.sidebar !== false);
@@ -709,9 +746,7 @@ export function SidebarResponsive(props) {
               alignItems="center"
               onClick={() => {
                 // Toggle the category
-                const updatedState = {...state};
-                updatedState[prop.state] = !updatedState[prop.state];
-                setState(updatedState);
+                setState({ ...state, [prop.state]: !state[prop.state] });
               }}
               cursor="pointer"
               mb={{ base: "6px", xl: "12px" }}
@@ -764,6 +799,16 @@ export function SidebarResponsive(props) {
               _focus={{
                 boxShadow: "none",
               }}
+              _after={{
+                content: isActive ? '""' : "none",
+                position: "absolute",
+                top: "4",
+                right: "0",
+                width: "2px",
+                height: "45%",
+                backgroundColor: "blue.500",
+                borderRadius: "0px 4px 4px 0px",
+              }}
             >
               <Flex position="relative">
                 {typeof prop.icon === "string" ? (
@@ -812,9 +857,8 @@ export function SidebarResponsive(props) {
     });
   };
 
-  // Calculate bottom padding based on secondary navbar
-  // Move footer up if secondary navbar is not open
-  const contentBottomPadding = secondaryNavbarOpen ? "150px" : "80px";
+  // Calculate bottom padding based on secondary navbar and category state
+  const contentBottomPadding = anyCategoryOpen ? "20px" : (secondaryNavbarOpen ? "150px" : "80px");
 
   // Filter routes that should appear in sidebar for responsive view
   const sidebarRoutes = routes.filter(route => route.sidebar !== false);
@@ -845,8 +889,8 @@ export function SidebarResponsive(props) {
             <Box mb={contentBottomPadding} p="16px">
               {links}
               
-              {/* Secondary Navbar in responsive view */}
-              {activeSecondaryRoute && (
+              {/* Secondary Navbar in responsive view - hidden if category open */}
+              {activeSecondaryRoute && !anyCategoryOpen && (
                 <SecondaryNavbar route={routes.find(r => r.path === activeSecondaryRoute)} />
               )}
             </Box>
