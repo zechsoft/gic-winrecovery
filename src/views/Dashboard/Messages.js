@@ -16,7 +16,83 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FiSearch, FiSend, FiPaperclip, FiMoreVertical } from "react-icons/fi";
-import axios from "axios";
+
+// Sample data for the demo
+const SAMPLE_USERS = [
+  {
+    username: "JohnDoe",
+    lastMessage: "Looking forward to our meeting tomorrow!",
+    unread: true,
+    isOnline: true,
+    avatar: "https://i.pravatar.cc/150?u=john"
+  },
+  {
+    username: "SarahSmith",
+    lastMessage: "Thanks for sending over those files.",
+    unread: false,
+    isOnline: true,
+    avatar: "https://i.pravatar.cc/150?u=sarah"
+  },
+  {
+    username: "MikeBrown",
+    lastMessage: "Did you review the quarterly report?",
+    unread: true,
+    isOnline: false,
+    avatar: "https://i.pravatar.cc/150?u=mike"
+  },
+  {
+    username: "EmilyJohnson",
+    lastMessage: "The client loved our presentation!",
+    unread: false,
+    isOnline: true,
+    avatar: "https://i.pravatar.cc/150?u=emily"
+  },
+  {
+    username: "AlexWilliams",
+    lastMessage: "Let's schedule a call for next week.",
+    unread: false,
+    isOnline: false,
+    avatar: "https://i.pravatar.cc/150?u=alex"
+  }
+];
+
+const SAMPLE_MESSAGES = {
+  "JohnDoe": [
+    { sender: "JohnDoe", receiver: "AjayClg", message: "Hey Ajay, how's the project coming along?", timestamp: "2025-03-09T10:30:00Z" },
+    { sender: "AjayClg", receiver: "JohnDoe", message: "Going well! We're on track to finish by Friday.", timestamp: "2025-03-09T10:32:00Z" },
+    { sender: "JohnDoe", receiver: "AjayClg", message: "That's great to hear! Do you need any resources?", timestamp: "2025-03-09T10:35:00Z" },
+    { sender: "AjayClg", receiver: "JohnDoe", message: "I think we're all set, but I'll let you know if anything comes up.", timestamp: "2025-03-09T10:40:00Z" },
+    { sender: "JohnDoe", receiver: "AjayClg", message: "Looking forward to our meeting tomorrow!", timestamp: "2025-03-09T14:25:00Z" }
+  ],
+  "SarahSmith": [
+    { sender: "SarahSmith", receiver: "AjayClg", message: "Hi Ajay, I've sent you the design files.", timestamp: "2025-03-08T15:10:00Z" },
+    { sender: "AjayClg", receiver: "SarahSmith", message: "Thanks Sarah, I'll take a look right away.", timestamp: "2025-03-08T15:15:00Z" },
+    { sender: "SarahSmith", receiver: "AjayClg", message: "Let me know if you need any clarifications.", timestamp: "2025-03-08T15:17:00Z" },
+    { sender: "AjayClg", receiver: "SarahSmith", message: "The designs look great! Just a couple of questions about the navigation.", timestamp: "2025-03-08T16:30:00Z" },
+    { sender: "SarahSmith", receiver: "AjayClg", message: "Thanks for sending over those files.", timestamp: "2025-03-08T17:05:00Z" }
+  ],
+  "MikeBrown": [
+    { sender: "MikeBrown", receiver: "AjayClg", message: "Ajay, have you seen the quarterly report?", timestamp: "2025-03-07T09:10:00Z" },
+    { sender: "AjayClg", receiver: "MikeBrown", message: "Yes, I reviewed it yesterday. Looks like we're exceeding our targets!", timestamp: "2025-03-07T09:20:00Z" },
+    { sender: "MikeBrown", receiver: "AjayClg", message: "Excellent! Can you prepare a summary for the board meeting?", timestamp: "2025-03-07T09:25:00Z" },
+    { sender: "AjayClg", receiver: "MikeBrown", message: "Sure thing. I'll have it ready by tomorrow.", timestamp: "2025-03-07T09:30:00Z" },
+    { sender: "MikeBrown", receiver: "AjayClg", message: "Did you review the quarterly report?", timestamp: "2025-03-07T14:45:00Z" }
+  ],
+  "EmilyJohnson": [
+    { sender: "EmilyJohnson", receiver: "AjayClg", message: "Hi Ajay! Just got out of the client meeting.", timestamp: "2025-03-06T11:30:00Z" },
+    { sender: "AjayClg", receiver: "EmilyJohnson", message: "How did it go?", timestamp: "2025-03-06T11:32:00Z" },
+    { sender: "EmilyJohnson", receiver: "AjayClg", message: "They loved our presentation! They want to move forward with the project.", timestamp: "2025-03-06T11:35:00Z" },
+    { sender: "AjayClg", receiver: "EmilyJohnson", message: "That's fantastic news! Great job on the presentation.", timestamp: "2025-03-06T11:40:00Z" },
+    { sender: "EmilyJohnson", receiver: "AjayClg", message: "The client loved our presentation!", timestamp: "2025-03-06T13:15:00Z" }
+  ],
+  "AlexWilliams": [
+    { sender: "AlexWilliams", receiver: "AjayClg", message: "Ajay, we need to discuss the upcoming product launch.", timestamp: "2025-03-05T14:10:00Z" },
+    { sender: "AjayClg", receiver: "AlexWilliams", message: "Sure, I'm available this afternoon or tomorrow morning.", timestamp: "2025-03-05T14:15:00Z" },
+    { sender: "AlexWilliams", receiver: "AjayClg", message: "Let's do tomorrow at 10am?", timestamp: "2025-03-05T14:20:00Z" },
+    { sender: "AjayClg", receiver: "AlexWilliams", message: "That works for me. I'll send a calendar invite.", timestamp: "2025-03-05T14:25:00Z" },
+    { sender: "AlexWilliams", receiver: "AjayClg", message: "Let's schedule a call for next week.", timestamp: "2025-03-05T16:40:00Z" }
+  ]
+};
 
 export default function Messages() {
   const [search, setSearch] = useState("");
@@ -24,7 +100,7 @@ export default function Messages() {
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const currentUser = "AjayClg"; // Replace with actual user from auth
+  const currentUser = "AjayClg"; // This would normally come from auth
   const toast = useToast();
 
   // Chakra color mode values
@@ -38,53 +114,32 @@ export default function Messages() {
   const messageBubbleSent = useColorModeValue("blue.500", "blue.400");
   const messageBubbleReceived = useColorModeValue("gray.100", "gray.700");
 
-  // Fetch users
+  // Initialize with sample data
   useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/users");
-        console.log("Fetched Users:", response.data);
-        setChats(response.data);
-      } catch (error) {
-        console.error("Error fetching chat users:", error);
-        toast({
-          title: "Error fetching users",
-          description: "Could not load chat users. Please try again later.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    };
+    setChats(SAMPLE_USERS);
+  }, []);
 
-    fetchChats();
-  }, [toast]);
-
-  // Fetch messages when a user is selected
+  // Load messages when a chat is selected
   useEffect(() => {
     if (selectedChat) {
-      setMessages([]); // Clear previous messages first
-      axios
-        .get(`http://localhost:5000/api/chat/messages/${currentUser}/${selectedChat.username}`)
-        .then((response) => {
-          console.log("Fetched Messages:", response.data);
-          setMessages(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching messages:", error);
-          toast({
-            title: "Error fetching messages",
-            description: "Could not load messages. Please try again later.",
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
-        });
+      const chatMessages = SAMPLE_MESSAGES[selectedChat.username] || [];
+      setMessages(chatMessages);
+      
+      // Mark as read (would update to the server in a real app)
+      if (selectedChat.unread) {
+        setChats(prevChats => 
+          prevChats.map(chat => 
+            chat.username === selectedChat.username 
+              ? { ...chat, unread: false } 
+              : chat
+          )
+        );
+      }
     }
-  }, [selectedChat, currentUser, toast]);
+  }, [selectedChat]);
 
-  // Send message
-  const sendMessage = async () => {
+  // Send message function
+  const sendMessage = () => {
     if (!newMessage.trim()) {
       toast({
         title: "Empty message",
@@ -96,38 +151,36 @@ export default function Messages() {
       return;
     }
 
-    try {
-      const payload = {
-        sender: currentUser,
-        receiver: selectedChat.username,
-        message: newMessage,
-        timestamp: new Date().toISOString(),
-      };
-      console.log("Sending Message:", payload);
+    const newMsg = {
+      sender: currentUser,
+      receiver: selectedChat.username,
+      message: newMessage,
+      timestamp: new Date().toISOString(),
+    };
 
-      const response = await axios.post("http://localhost:5000/api/chat/messages/send", payload);
-      console.log("Message Sent Response:", response.data);
+    // Add message to the current conversation
+    setMessages(prevMessages => [...prevMessages, newMsg]);
+    
+    // Update the last message in the chat list
+    setChats(prevChats => 
+      prevChats.map(chat => 
+        chat.username === selectedChat.username 
+          ? { ...chat, lastMessage: newMessage } 
+          : chat
+      )
+    );
 
-      setMessages([...messages, payload]);
-      setNewMessage("");
+    // Clear the input
+    setNewMessage("");
 
-      toast({
-        title: "Message sent",
-        status: "success",
-        duration: 1000,
-        isClosable: true,
-        position: "top-right",
-      });
-    } catch (error) {
-      console.error("Error sending message:", error);
-      toast({
-        title: "Error sending message",
-        description: "Could not send message. Please try again.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
+    // Show success toast
+    toast({
+      title: "Message sent",
+      status: "success",
+      duration: 1000,
+      isClosable: true,
+      position: "top-right",
+    });
   };
 
   // Handle Enter key press
@@ -196,7 +249,7 @@ export default function Messages() {
                   cursor="pointer"
                   transition="all 0.2s"
                 >
-                  <Avatar size="md" mr={3} name={chat.username} />
+                  <Avatar size="md" mr={3} name={chat.username} src={chat.avatar} />
                   <Box flex="1">
                     <Text fontWeight="bold">{chat.username}</Text>
                     <Text fontSize="sm" color="gray.500" noOfLines={1}>
@@ -234,7 +287,7 @@ export default function Messages() {
                 bg={useColorModeValue("white", "gray.800")}
               >
                 <Flex align="center">
-                  <Avatar size="md" mr={3} name={selectedChat.username} />
+                  <Avatar size="md" mr={3} name={selectedChat.username} src={selectedChat.avatar} />
                   <Box>
                     <Text fontWeight="bold">{selectedChat.username}</Text>
                     <Text fontSize="xs" color="gray.500">
@@ -275,7 +328,14 @@ export default function Messages() {
                     mb={4}
                   >
                     {msg.sender !== currentUser && (
-                      <Avatar size="sm" mr={2} name={msg.sender} />
+                      <Avatar 
+                        size="sm" 
+                        mr={2} 
+                        name={msg.sender} 
+                        src={
+                          chats.find(chat => chat.username === msg.sender)?.avatar
+                        }
+                      />
                     )}
                     <Box
                       bg={

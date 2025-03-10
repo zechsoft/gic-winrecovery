@@ -58,6 +58,12 @@ export default function SignIn() {
   // Initialize useHistory
   const history = useHistory();
 
+  // Hardcoded user credentials
+  const users = [
+    { email: "mugil9451@gmail.com", password: "mugil123", role: "admin" },
+    { email: "client@globalindiacorp.com", password: "client123", role: "client" }
+  ];
+
   // Scroll event handler - enhanced with scroll position tracking
   useEffect(() => {
     const handleScroll = () => {
@@ -104,8 +110,8 @@ export default function SignIn() {
     };
   }, []);
 
-  // Function to handle sign in
-  const handleSignIn = async () => {
+  // Function to handle sign in with hardcoded credentials
+  const handleSignIn = () => {
     // Simple validation
     if (!email || !password) {
       toast({
@@ -120,62 +126,53 @@ export default function SignIn() {
 
     setIsLoading(true); // Start loading
 
-    try {
-      // Make API call to backend
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    // Simulate network delay
+    setTimeout(() => {
+      // Find user by email and password
+      const user = users.find(u => u.email === email && u.password === password);
+      
+      if (user) {
+        // Successful login
+        const userData = {
+          email: email,
+          role: user.role,
+          isAuthenticated: true,
+          token: "sample-jwt-token-" + user.role, // Mock token
+        };
 
-      const data = await response.json();
+        if (rememberMe) {
+          localStorage.setItem("user", JSON.stringify(userData));
+        } else {
+          sessionStorage.setItem("user", JSON.stringify(userData));
+        }
 
-      if (!response.ok) {
-        throw new Error(data.msg || "Login failed");
-      }
+        // Redirect based on role
+        if (user.role === "admin") {
+          history.push("/admin/dashboard");
+        } else {
+          history.push("/client/dashboard");
+        }
 
-      // Extract user role from the response
-      const userRole = data.user.role;
-
-      // Success - store user info in localStorage or sessionStorage
-      const userData = {
-        email: email,
-        role: userRole, // Use the role from server response
-        isAuthenticated: true,
-        token: data.token, // Store the JWT token
-      };
-
-      if (rememberMe) {
-        localStorage.setItem("user", JSON.stringify(userData));
+        toast({
+          title: "Login Successful",
+          description: `Welcome to Global India Corporation!`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
-        sessionStorage.setItem("user", JSON.stringify(userData));
+        // Failed login
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
-
-      // Redirect based on role from server response
-      if (userRole === "admin") {
-        history.push("/admin/dashboard");
-      } else {
-        history.push("/client/dashboard");
-      }
-
-      toast({
-        title: "Login Successful",
-        description: `Welcome to Global India Corporation!`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch (err) {
-      toast({
-        title: "Login Failed",
-        description: err.message || "Invalid email or password",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    } finally {
+      
       setIsLoading(false); // Stop loading
-    }
+    }, 1000); // 1 second delay to simulate network request
   };
 
   // Animation variants for scroll animations
