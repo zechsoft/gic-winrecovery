@@ -35,6 +35,7 @@
     right: -60px; /* Initially hidden on the right */
     top: 0;
     height: 50vh;
+    margin-right: 8px;
     width: 60px;
     background-color: white;
     display: flex;
@@ -44,8 +45,9 @@
     justify-content: center;
     box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
     border-left: 1px solid #ddd; /* Change border to the left */
-    border-top-left-radius: 20px;  /* Rounded top-left */
-    border-bottom-left-radius: 20px; /* Rounded bottom-left */
+    /* border-top-left-radius: 20px;  Rounded top-left
+    border-bottom-left-radius: 20px; Rounded bottom-left */
+    border-radius: 10px;
     transition: right 0.3s ease-in-out, border-radius 0.3s ease-in-out;
 }
 
@@ -72,9 +74,11 @@
     transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
+
 .icon-sidebar-btn:hover {
     transform: scale(1.1);
     color: #3182ce; /* Keep the color consistent even when hovered */
+    
 }
 
 /* Responsive */
