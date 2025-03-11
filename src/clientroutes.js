@@ -4,6 +4,7 @@ import SupplierInfo from "views/Dashboard/SupplierInfo.js";
 import CustomerOrder from "views/Dashboard/CustomerOrder.js";
 import Profile from "views/Dashboard/Profile.js";
 import Messages from 'views/Dashboard/Messages';
+import chat from 'views/Dashboard/chat';
 import SignIn from "views/Pages/SignIn.js";
 import ForgotPassword from "views/Pages/ForgotPassword.js";
 import SignUp from "views/Pages/SignUp.js";
@@ -81,6 +82,15 @@ var clientRoutes = [
     icon: <StatsIcon color='inherit' />,
     component: Messages,
     layout: "/client",
+    sidebar: true, // Show in sidebar
+  },
+  {
+    path: "/chat",
+    name: "char",
+    rtlName: "لوحة القيادة",
+    icon: <StatsIcon color='inherit' />,
+    component: Messages,
+    layout: "/chat",
     sidebar: true, // Show in sidebar
   },
   {

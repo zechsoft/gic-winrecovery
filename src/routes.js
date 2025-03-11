@@ -3,6 +3,7 @@ import Dashboard from "views/Dashboard/Dashboard.js";
 import Tables from "views/Dashboard/Tables.js";
 import SupplierInfo from "views/Dashboard/SupplierInfo.js";
 import Messages from 'views/Dashboard/Messages';
+import chat from 'views/Dashboard/chat';
 import CustomerOrder from "views/Dashboard/CustomerOrder.js";
 import Profile from "views/Dashboard/Profile.js";
 import ForgotPassword from "views/Pages/ForgotPassword.js";
@@ -46,6 +47,15 @@ var dashRoutes = [
   {
     path: "/message",
     name: "Message",
+    rtlName: "لوحة القيادة",
+    icon: <StatsIcon color='inherit' />,
+    component: Messages,
+    layout: "/admin",
+    sidebar: true,
+  },
+  {
+    path: "/chat",
+    name: "chat",
     rtlName: "لوحة القيادة",
     icon: <StatsIcon color='inherit' />,
     component: Messages,
